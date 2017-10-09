@@ -19,4 +19,9 @@ public class DefaultController {
         return new ModelAndView("member/admin/country");
     }
 
+    @GetMapping("/admin/operator")
+    public ModelAndView operator() {
+        return new ModelAndView("member/admin/operator");
+    }
+
 }
