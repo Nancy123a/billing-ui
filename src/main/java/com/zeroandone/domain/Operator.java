@@ -1,5 +1,6 @@
 package com.zeroandone.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,12 +24,10 @@ public class Operator {
 
     private int obsolete;
 
-    //@JsonFormat(pattern="dd-MM-yyyy")
-    //@Type(type="org.hibernate.type.LocalDateType")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate activationDate;
 
-    //@JsonFormat(pattern="dd-MM-yyyy")
-    //@Type(type="org.hibernate.type.LocalDateType")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate deactivationDate;
 
     private short typeId;
