@@ -13,4 +13,5 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
     @RestResource(path = "findByCountryName", rel = "findByCountryName")
     Page<Country> findByCountryName(@Param("countryName") String countryName, Pageable pageable);
 
+
 }

@@ -8,4 +8,6 @@ public interface CountryDataTable {
     int getCountryId();
 
     String getCountryName();
+
+
 }
