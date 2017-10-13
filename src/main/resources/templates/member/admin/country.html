@@ -31,43 +31,96 @@
                         <a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
                     </div>
                 </div>
-                <div class="md-modal md-fade-in-scale-up" id="md-fade-in-scale-up">
-                    <div class="md-content">
-                        <h3>Add Country</h3>
-                        <div>
-                            <form role="form" id="countryForm">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Country Name" id="country"/>
-                                </div>
-                            </form>
-                            <div class="row">
-                                <div class="col-md-4"></div>
-                                <div class="col-md-4">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <button class="btn btn-danger md-close">Close me!</button>
-                                        </div>
-                                        <div class="col-md-2"></div>
-                                        <div class="col-md-4">
-                                            <button type="submit" class="btn btn-success" id="button">Add Country
-                                            </button>
+                <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Edit Country</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form role="form" id="EditcountryForm">
+                                    <div class="form-group">
+                                        <input type="hidden" class="form-control" id="EditcountryId"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Country Name"
+                                               id="Editcountry"/>
+                                    </div>
+                                </form>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <div class="row">
+
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-success" id="buttonEdit">Edit
+                                                    Country
+                                                </button>
+                                            </div>
+                                            <div class="col-md-3"></div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div><!-- End div .md-content -->
-                </div>
 
-            </div>
+                            </div>
+
+
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
+
+                <div id="myModalAdd" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="label"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title" id="label">Add Country</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form role="form" id="AddcountryForm">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Country Name"
+                                               id="country"/>
+                                    </div>
+                                </form>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <div class="row">
+
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-success" id="button">Add Country
+                                                </button>
+                                            </div>
+                                            <div class="col-md-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
 
 
             <div class="widget-content">
                 <div class="data-table-toolbar">
                     <div class="row">
-                        <div class="col-md-7"></div>
+                        <div class="col-md-10"></div>
                         <div class="col-md-2">
-                            <button data-modal="md-fade-in-scale-up" class="btn btn-success  md-trigger"><i
+                            <button data-toggle="modal" data-target="#myModalAdd" class="btn btn-success"><i
                                     class="fa fa-plus-circle"></i>Add Country
                             </button>
                         </div>
@@ -82,6 +135,8 @@
                             <tr>
                                 <th>Id</th>
                                 <th>Name</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
                             </tr>
                             </thead>
 
@@ -89,6 +144,8 @@
                             <tr>
                                 <th>Id</th>
                                 <th>Name</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
                             </tr>
                             </tfoot>
 
@@ -99,6 +156,7 @@
 
             </div>
         </div>
+    </div>
     </div>
 </div>
 
@@ -113,8 +171,18 @@
         // <![CDATA[
         var table;
         var recordsTotal = 0;
-        $(document).ready(function () {
+        $(function () {
+            function actionEditButtons() {
+                return '<div>\n' +
+                    '<a title="Edit" class="edit btn btn-warning" data-toggle="modal" data-target="#myModal"><i class="fa fa-edit"></i>Edit</a>' +
+                    '</div>';
+            }
 
+            function actionDeleteButtons() {
+                return '<div >\n' +
+                    '<a title="Delete" class="delete btn btn-danger"><i class="fa fa-times"></i>Delete</a>' +
+                    '</div>';
+            }
             table = $('#operatorDTCountry').DataTable({
                 dom: 'T<"clear">lfrtip',
                 tableTools: {
@@ -128,9 +196,19 @@
                 },
                 "columns": [
                     {"data": 'countryId'},
-                    {"data": 'countryName'}
+                    {"data": 'countryName'},
+                    {
+                        "data": null,
+                        "defaultContent": actionEditButtons()
+                    },
+                    {
+                        "data": null,
+                        "defaultContent": actionDeleteButtons()
+                    }
+
                 ],
                 "ajax": function (data, callback, settings) {
+
                     var url = "/api/countries?projection=dataTable";
 
                     if (data.search != null && data.search.value != "") {
@@ -174,30 +252,103 @@
 
         $("#button").click(function () {
 
-            var formData = {countryName: $('#country').val()};
+            var countryname = $('#country').val();
+            if (countryname != null && countryname != "") {
+                var formData = {countryName: countryname};
 
 
-            var url = "/api/countries";
+                var url = "/api/countries";
 
+
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: url,
+                    data: JSON.stringify(formData),
+                    dataType: 'json',
+                    success: function (result) {
+
+                        table.ajax.reload();
+                        $("#myModalAdd").modal('hide');
+                        $("#AddcountryForm")[0].reset();
+
+                    },
+                    error: function (e) {
+                        alert("Error " + e);
+                    }
+                });
+            }
+            else {
+                alert("Please Enter you Country Name.");
+            }
+        });
+
+
+        $('#operatorDTCountry').on('click', 'a.edit', function (e) {
+            var data = table.row($(this).parents('tr')).data();
+
+            $('#EditcountryId').val(data.countryId).attr('readonly', true);
+            $('#Editcountry').val(data.countryName);
+
+            $("#buttonEdit").click(function () {
+
+                var countryname = $('#Editcountry').val();
+                var countryid = $('#EditcountryId').val();
+                if (countryname != null && countryname != "") {
+                    var formData = {countryName: countryname};
+
+
+                    var url = "/api/countries/" + countryid;
+
+
+                    $.ajax({
+                        type: "PUT",
+                        contentType: "application/json",
+                        url: url,
+                        data: JSON.stringify(formData),
+                        dataType: 'json',
+                        success: function (result) {
+
+                            table.ajax.reload();
+                            $("#myModal").modal('hide');
+                            $("#EditcountryForm")[0].reset();
+
+                        },
+                        error: function (e) {
+                            alert("Error " + e);
+                        }
+                    });
+                }
+                else {
+                    alert("Please Enter Country name");
+                }
+            });
+
+        });
+
+
+        $('#operatorDTCountry').on('click', 'a.delete', function (e) {
+
+            var data = table.row($(this).parents('tr')).data();
+            var url = "/api/countries/" + data.countryId;
+            var formData = {};
 
             $.ajax({
-                type: "POST",
+                type: "DELETE",
                 contentType: "application/json",
                 url: url,
                 data: JSON.stringify(formData),
                 dataType: 'json',
                 success: function (result) {
-
                     table.ajax.reload();
-                    $("#md-fade-in-scale-up").modal('hide');
 
                 },
                 error: function (e) {
-                    alert("Error " + e);
+                    alert("Error You cant Delete this row");
                 }
             });
-        });
 
+        });
         // ]]>
 
 
