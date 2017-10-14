@@ -23,7 +23,7 @@ public class CdrStatisticBase {
 
   private int connected;
 
-  private int duration;
+  private double duration;
 
   @Id
   private String customer;
@@ -60,9 +60,9 @@ public class CdrStatisticBase {
   private Operator egressOperator;
 
   @Column(name = "cduration")
-  private int customerDuration;
+  private double customerDuration;
 
   @Column(name = "vduration")
-  private int vendorDuration;
+  private double vendorDuration;
 
 }

@@ -20,11 +20,11 @@ public class CDRStatistic implements Serializable {
 	private int connected;
 	@NumberFormat(style= Style.NUMBER,pattern="#,###.##")
 	@Getter(AccessLevel.NONE)
-	private int duration;
+	private double duration;
 	@Getter(AccessLevel.NONE)
-	private int customerDuration;
+	private double customerDuration;
 	@Getter(AccessLevel.NONE)
-	private int vendorDuration;
+	private double vendorDuration;
 	private LocalDate sigDate;
 	private int sigHour;
 	private String customer;
