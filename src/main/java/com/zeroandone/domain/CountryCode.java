@@ -1,5 +1,6 @@
 package com.zeroandone.domain;
 
+import com.zeroandone.repository.CountryRepository;
 import lombok.Getter;
 import lombok.Setter;
 

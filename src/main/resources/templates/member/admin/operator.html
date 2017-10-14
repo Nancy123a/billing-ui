@@ -60,24 +60,67 @@
             </div>
         </div>
     </div>
+    <form class="form-horizontal" style="display: none;" id="input-form">
+
+        <div id="errorMessageDiv" class="alert alert-danger" style="display: none;">
+            <button id="btnCloseErrorDiv" type="button" class="close">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <label id="errorMessage"></label>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label" for="operatorName">Operator
+                Name</label>
+
+            <div class="col-xs-7">
+                <input type="text"
+                       name="operatorName" id="operatorName" class="form-control"
+                       value=""/>
+            </div>
+        </div>
+        <div class="form-group" style="display: none;">
+            <label class="col-xs-3 control-label" for="operatorId">Operator
+                ID</label>
+
+            <div class="col-xs-7">
+                <div class="clearfix">
+                    <input type="text" name="operatorId"
+                           id="operatorId" class="form-control" value=""/>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-xs-7 col-xs-offset-3">
+                <button type="submit" class="btn btn-primary" id="btnSubmit"
+                        name="save">Submit
+                </button>
+                <button type="button" class="btn btn-default" id="btnCancel"
+                        name="cancel">Cancel
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 <div layout:fragment="script">
     <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js}"></script>
+    <script th:src="@{/assets/libs/bootbox/bootbox.min.js}"></script>
     <script>
         // <![CDATA[
         $(function() {
             function actionButtons() {
-                return '<div />';
-                return '<div id="actionButtons" class="row btn-group">'+
-                    '<div id="triggerDetails" class="btn btn-sm btn-default"><input data-toggle="modal" data-target="#modal" type="button" style="background: none; border: none;" value="Details"/></div>'+
+                return '<div class="btn-group btn-group-xs">\n' +
+                    '<a title="Edit" class="edit btn btn-default"><i class="fa fa-edit"></i></a>' +
+                    '<a title="Delete" class="delete btn btn-default"><i class="fa fa-times"></i></a>' +
                     '</div>';
             }
 
             var recordsTotal = 0;
 
-            $('#operatorDT').DataTable({
+            var operatorDT = $('#operatorDT').DataTable({
                 dom: 'T<"clear">lfrtip',
                 tableTools: {
                     "sSwfPath": "/assets/libs/jquery-datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
@@ -136,6 +179,30 @@
                         $('#error').show();
                     });
                 },
+            });
+
+            $('#operatorDT').on('click', 'a.edit', function (e) {
+                var data = operatorDT.row($(this).parents('tr')).data();
+                boxEdit = bootbox.dialog({
+                    title: 'Edit Operator',
+                    message: $('#input-form'),
+                    show: false,
+                }).on('shown.bs.modal', function (e) {
+                    if (e.target == this) {
+                        $('#errorMessageDelDiv').hide();
+                        $('#successMessageDiv').hide();
+                        $('#errorMessageDiv').hide();
+                        $('#operatorId').val(data.operatorId).attr('readonly', true);
+                        $('#operatorName').val(data.operatorName);
+                    }
+                }).on('hide.bs.modal', function (e) {
+
+                    if (e.target == this) {
+                        $('#input-form').hide().appendTo('body');
+                    }
+                });
+                boxEdit.modal('show');
+                return false;
             });
         });
         // ]]>
