@@ -1,5 +1,10 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
+INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier1','Carrier1');
+INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier2','Carrier2');
+INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier3','Carrier3');
+INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier4','Carrier4');
+
 INSERT INTO country (COUNTRY_ID, COUNTRY_NAME) VALUES (1, 'Afghanistan');
 INSERT INTO country (COUNTRY_ID, COUNTRY_NAME) VALUES (2, 'Albania');
 INSERT INTO country (COUNTRY_ID, COUNTRY_NAME) VALUES (3, 'Algeria');

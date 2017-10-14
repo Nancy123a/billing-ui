@@ -7,6 +7,11 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class DefaultController {
 
+    @GetMapping("/reports/statistics")
+    public ModelAndView reports() {
+        return new ModelAndView("member/reports/statistics");
+    }
+
 
     @GetMapping({"/","/dashboard"})
     public ModelAndView dashboard() {
