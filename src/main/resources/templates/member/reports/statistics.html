@@ -152,8 +152,11 @@
 </div>
 <div layout:fragment="script">
     <script th:src="@{/assets/libs/moment/moment.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone-data.min.js}"></script>
     <script th:src="@{/assets/libs/date-range-picker/js/daterangepicker.js}"></script>
     <script th:src="@{/assets/libs/bootstrap-select2/js/select2.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.extended-ajax.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js}"></script>
@@ -164,7 +167,7 @@
         // <![CDATA[
         $(function() {
 
-            //moment.tz.setDefault("UTC");
+            moment.tz.setDefault("UTC");
 
             function getStartDate() {
                 var date = $('#daterange').data('daterangepicker').startDate;
@@ -177,6 +180,14 @@
             }
 
             $('#daterange').daterangepicker({
+                startDate: moment().startOf('day'),
+                endDate: moment().endOf('day'),
+                minDate: '01/01/2012',
+                maxDate: moment().hour(23),
+//                showDropdowns: false,
+//                timePicker: true,
+//                timePickerIncrement: 60,
+//                timePicker24Hour: true,
                 locale: {
                     format: 'DD/MM/YYYY HH:00'
                 },
@@ -190,21 +201,12 @@
                 }
             });
 
-            var ALL_VALUES = {id: 0, text: 'All'};
-
             $.fn.select2.defaults.set("placeholder", {id: 'none', text: 'None'});
-
-            function setSelect2Options(e, element) {
-                var selected = element.val();
-                if(selected && selected.length) {
-                    if (selected.indexOf(ALL_VALUES.id.toString()) >= 0) {
-                        element.empty().append(new Option(ALL_VALUES.text, ALL_VALUES.id, true, true));
-                    }
-                }
-            }
 
 
             $('#customer,#vendor').select2({
+                dataAdapter: $.fn.select2.amd.require('select2/data/extended-ajax'),
+                defaultResults: [{id: 0, text: 'All'}],
                 multiple: true,
                 minimumInputLength: 3,
                 language: {
@@ -217,34 +219,24 @@
                     quietMillis : 500,
                     data : function(params) {
                         return {
-                            name: params.term,
+                            carrierName: params.term,
                             page: (params.page || 1) - 1,
                             projection: 'select2'
                         }
                     },
                     processResults : function (data,page) {
-                        if (data._embedded) {
-                            if ("all".startsWith(page.term)) {
-                                data._embedded.carriers.unshift(ALL_VALUES);
-                            }
-                            return {
-                                results: data._embedded.carriers
-                            };
-                        } else {
-                            var data = [];
-                            if ("all".startsWith(page.term)) {
-                                data.unshift(ALL_VALUES);
-                            }
+                        if (data._embedded)
+                            return { results: data._embedded.carriers };
+                        else
                             return {results: data};
-                        }
                     }
                 },
                 theme: 'bootstrap'
-            }).change(function(e) {
-                setSelect2Options(e, $(this));
             });
 
             $('#icountry,#ecountry').select2({
+                dataAdapter: $.fn.select2.amd.require('select2/data/extended-ajax'),
+                defaultResults: [{id: 0, text: 'All'}],
                 multiple: true,
                 minimumInputLength: 3,
                 language: {
@@ -253,38 +245,28 @@
                     }
                 },
                 ajax : {
-                    url : "/api/carriers",
+                    url : "/api/countries",
                     quietMillis : 500,
                     data : function(params) {
                         return {
-                            name: params.term,
+                            countryName: params.term,
                             page: (params.page || 1) - 1,
                             projection: 'select2'
                         }
                     },
                     processResults : function (data,page) {
-                        if (data._embedded) {
-                            if ("all".startsWith(page.term)) {
-                                data._embedded.carriers.unshift(ALL_VALUES);
-                            }
-                            return {
-                                results: data._embedded.carriers
-                            };
-                        } else {
-                            var data = [];
-                            if ("all".startsWith(page.term)) {
-                                data.unshift(ALL_VALUES);
-                            }
+                        if (data._embedded)
+                            return { results: data._embedded.countries };
+                         else
                             return {results: data};
-                        }
                     }
                 },
                 theme: 'bootstrap'
-            }).change(function(e) {
-                setSelect2Options(e, $(this));
             });
 
             $('#ioperator,#eoperator').select2({
+                dataAdapter: $.fn.select2.amd.require('select2/data/extended-ajax'),
+                defaultResults: [{id: 0, text: 'All'}],
                 multiple: true,
                 minimumInputLength: 3,
                 language: {
@@ -293,35 +275,23 @@
                     }
                 },
                 ajax : {
-                    url : "/api/carriers",
+                    url : "/api/operators",
                     quietMillis : 500,
                     data : function(params) {
                         return {
-                            name: params.term,
+                            operatorName: params.term,
                             page: (params.page || 1) - 1,
                             projection: 'select2'
                         }
                     },
                     processResults : function (data,page) {
-                        if (data._embedded) {
-                            if ("all".startsWith(page.term)) {
-                                data._embedded.carriers.unshift(ALL_VALUES);
-                            }
-                            return {
-                                results: data._embedded.carriers
-                            };
-                        } else {
-                            var data = [];
-                            if ("all".startsWith(page.term)) {
-                                data.unshift(ALL_VALUES);
-                            }
-                            return {results: data};
-                        }
+                        if (data._embedded)
+                            return { results: data._embedded.operators };
+                        else
+                            return { results: data };
                     }
                 },
                 theme: 'bootstrap'
-            }).change(function(e) {
-                setSelect2Options(e, $(this));
             });
 
 
@@ -512,9 +482,9 @@
                 reloadAjax();
             });
 
-            oTable.on('preXhr.dt', function ( e, settings, data ) {
-                console.log("preXhr");
-            });
+//            oTable.on('preXhr.dt', function ( e, settings, data ) {
+//                console.log("preXhr");
+//            });
 
             oTable.on('xhr.dt', function (e, settings, json, xhr) {
                 //$("#cdrGroup").find('tfoot').hide();
