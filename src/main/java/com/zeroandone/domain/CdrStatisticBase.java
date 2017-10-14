@@ -35,28 +35,28 @@ public class CdrStatisticBase {
   private int ingressCountryId;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="ingresscountryid",insertable = false,updatable = false)
+  @JoinColumn(name="ingressCountryId",insertable = false,updatable = false)
   private Country ingressCountry;
 
   @Id
   private int egressCountryId;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="egresscountryid",insertable = false,updatable = false)
+  @JoinColumn(name="egressCountryId",insertable = false,updatable = false)
   private Country egressCountry;
 
   @Id
   private int ingressOperatorId;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="ingressoperatorid",insertable = false,updatable = false)
+  @JoinColumn(name="ingressOperatorId",insertable = false,updatable = false)
   private Operator ingressOperator;
 
   @Id
   private int egressOperatorId;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name="egressoperatorid",insertable = false,updatable = false)
+  @JoinColumn(name="egressOperatorId",insertable = false,updatable = false)
   private Operator egressOperator;
 
 }

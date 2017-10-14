@@ -6,3 +6,26 @@ spring:
     serialization:
       FAIL_ON_EMPTY_BEANS : false
       WRITE_DATES_AS_TIMESTAMPS : false
+  datasource:
+    tomcat:
+      initial-size: 1
+---
+spring:
+  profiles: prod
+  h2:
+    console:
+      enabled: false
+  datasource:
+     url: "jdbc:mysql://db.clmafkijmkqr.us-east-2.rds.amazonaws.com:3306/portal"
+     username: master
+     password: Tx9P50LxnPXO
+     driver-class-name: com.mysql.jdbc.Driver
+     tomcat:
+       test-on-borrow: true
+       validation-query: SELECT 1
+       initial-size: 3
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    generate-ddl: false

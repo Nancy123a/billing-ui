@@ -122,11 +122,11 @@ public class CDRStatisticCriteria {
         }
 
 
-        if(getCustomer().size() > 0 && !getCustomer().get(0).equalsIgnoreCase("all")) {
+        if(getCustomer().size() > 0 && !getCustomer().get(0).equalsIgnoreCase("0")) {
             where.and(qCdrStatisticBase.customer.in(getCustomer()));
         }
 
-        if(getVendor().size() > 0 && !getVendor().get(0).equalsIgnoreCase("all")) {
+        if(getVendor().size() > 0 && !getVendor().get(0).equalsIgnoreCase("0")) {
             where.and(qCdrStatisticBase.vendor.in(getVendor()));
         }
 
