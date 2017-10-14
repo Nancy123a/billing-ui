@@ -23,7 +23,7 @@ public class CdrStatisticBase {
 
   private int connected;
 
-  private double duration;
+  private int duration;
 
   @Id
   private String customer;
@@ -58,11 +58,5 @@ public class CdrStatisticBase {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="egressoperatorid",insertable = false,updatable = false)
   private Operator egressOperator;
-
-  @Column(name = "cduration")
-  private double customerDuration;
-
-  @Column(name = "vduration")
-  private double vendorDuration;
 
 }

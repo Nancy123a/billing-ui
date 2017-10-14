@@ -48,9 +48,7 @@ public class CDRStatisticCriteria {
 		Expression<Integer> sigHour = qCdrStatisticBase.sigHour;
         Expression<Integer> attempts = qCdrStatisticBase.attempts.sum();
         Expression<Integer> connected = qCdrStatisticBase.connected.sum();
-        Expression<Double> duration = qCdrStatisticBase.duration.sum();
-        Expression<Double> customerDuration = qCdrStatisticBase.customerDuration.sum();
-        Expression<Double> vendorDuration = qCdrStatisticBase.vendorDuration.sum();
+        Expression<Integer> duration = qCdrStatisticBase.duration.sum();
         Expression<String> customer = qCdrStatisticBase.customer;
         Expression<String> vendor = qCdrStatisticBase.vendor;
 		Expression<LocalDate> sigDate = qCdrStatisticBase.sigDate;
@@ -65,8 +63,6 @@ public class CDRStatisticCriteria {
         select.put("sigDate",sigDate);
         select.put("connected",connected);
         select.put("duration",duration);
-        select.put("customerDuration",customerDuration);
-        select.put("vendorDuration",vendorDuration);
 
 		if(isHourly())
 			select.put("sigHour",sigHour);

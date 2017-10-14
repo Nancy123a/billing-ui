@@ -20,11 +20,7 @@ public class CDRStatistic implements Serializable {
 	private int connected;
 	@NumberFormat(style= Style.NUMBER,pattern="#,###.##")
 	@Getter(AccessLevel.NONE)
-	private double duration;
-	@Getter(AccessLevel.NONE)
-	private double customerDuration;
-	@Getter(AccessLevel.NONE)
-	private double vendorDuration;
+	private int duration;
 	private LocalDate sigDate;
 	private int sigHour;
 	private String customer;
@@ -62,14 +58,6 @@ public class CDRStatistic implements Serializable {
 	@JsonProperty
 	public double getCeiledDuration() {
 		return (double)duration / 60;
-	}
-	@JsonProperty
-	public double getCustomerDuration() {
-		return (double)customerDuration /60;
-	}
-	@JsonProperty
-	public double getVendorDuration() {
-		return (double)vendorDuration /60;
 	}
 
 	@JsonProperty

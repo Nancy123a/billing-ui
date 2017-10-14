@@ -21,10 +21,10 @@ public class CdrStatisticBaseId implements Serializable {
     private int sigHour;
     @Id
     @Column(name = "customer")
-    private int customer;
+    private String customer;
     @Id
     @Column(name = "vendor")
-    private int vendor;
+    private String vendor;
     @Id
     @Column(name = "ingresscountryid")
     private int ingressCountryId;
