@@ -199,14 +199,14 @@ $(document).on("click", ".widget", function(){
     }
 });
 
-$(document).on("click", '.widget .reload', function (event) { 
-  event.preventDefault();
-  var el = $(this).parents(".widget:first");
-  blockUI(el);
-    window.setTimeout(function () {
-       unblockUI(el);
-    }, 1000);
-});
+// $(document).on("click", '.widget .reload', function (event) {
+//   event.preventDefault();
+//   var el = $(this).parents(".widget:first");
+//   blockUI(el);
+//     window.setTimeout(function () {
+//        unblockUI(el);
+//     }, 1000);
+// });
 
 $(document).on("click", ".widget-header .widget-maximize", function(event){
     event.preventDefault();

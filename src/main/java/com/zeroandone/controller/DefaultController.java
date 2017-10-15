@@ -1,11 +1,18 @@
 package com.zeroandone.controller;
 
+import com.zeroandone.repository.PivotTemplateRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class DefaultController {
+
+    private final PivotTemplateRepository pivotTemplateRepository;
+
+    public DefaultController(PivotTemplateRepository pivotTemplateRepository) {
+        this.pivotTemplateRepository = pivotTemplateRepository;
+    }
 
     @GetMapping("/reports/statistics")
     public ModelAndView reports() {
@@ -14,7 +21,9 @@ public class DefaultController {
 
     @GetMapping("/reports/custom")
     public ModelAndView custom() {
-        return new ModelAndView("member/reports/custom");
+        ModelAndView modelAndView = new ModelAndView("member/reports/custom");
+        modelAndView.addObject("templates",pivotTemplateRepository.findAll());
+        return modelAndView;
     }
 
 

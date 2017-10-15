@@ -79,7 +79,6 @@
                 <div class="widget-header">
                     <h2>Search Criteria</h2>
                     <div class="additional-btn">
-                        <a href="#" class=""><i class="icon-search"></i> </a>
                         <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
                     </div>
                 </div>
@@ -130,13 +129,18 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="widget">
+            <div id="result" class="widget">
                 <div class="widget-header">
                     <h2>Result</h2>
                     <div class="additional-btn">
-                        <a id="uiEdit" ><i class="icon-edit"></i> </a>
-                        <a data-target="#saveModal" data-toggle="modal" title="Save Report"><i class="icon-floppy"></i> </a>
-                        <a href="#" class=""><i class="icon-search"></i> </a>
+
+                        <a class="hidden reload"><i class="icon-ccw-1"></i></a>
+                        <a class="hidden" id="uiEdit" ><i class="icon-edit"></i> </a>
+                        <a class="hidden" data-target="#saveModal" data-toggle="modal" title="Save Report"><i class="icon-floppy"></i> </a>
+                        <select id="pivotTemplate">
+                            <option th:each="template : ${templates}"
+                                    th:value="${template.templateData}" th:text="${template.templateName}"></option>
+                        </select>
                         <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
                     </div>
                 </div>
@@ -148,6 +152,31 @@
             </div>
         </div>
     </div>
+    <div id="saveModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title text-center" id="myModalLabel">Manage Report</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="reportName" class="col-sm-3 control-label">Report Name</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" id="reportName" placeholder="Give report a name" type="text" />
+                            <p class="help-block">If report name <strong>exist</strong> report will be updated !</p>
+                        </div>
+                        <br />
+                        <br />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveReport" type="button" data-dismiss="modal" class="btn btn-success">Save/Update</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </div>
 <div layout:fragment="script">
     <script th:src="@{/assets/libs/moment/moment.min.js}"></script>
@@ -163,7 +192,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
     <script th:src="@{/assets/libs/pivottable/c3_renderers.min.js}"></script>
-
+    <script th:src="@{/assets/libs/jquery-notifyjs/notify.min.js}"></script>
 
     <script>
         // <![CDATA[
@@ -171,16 +200,6 @@
             var dateFormat =       $.pivotUtilities.derivers.dateFormat;
             var sortAs =           $.pivotUtilities.sortAs;
             var tpl =              $.pivotUtilities.aggregatorTemplates;
-
-            var defaultValues = {
-                aggregatorName : 'Sum',
-                vals : ['ceiledDuration'],
-                cols : [],
-                rows : [],
-                rendererName : 'Table',
-                exclusions : {},
-                options: { sort: null }
-            }
 
 
             var nrecoPivotExt = new NRecoPivotTableExtensions({
@@ -198,51 +217,54 @@
             });
 
 
-            function getAggregator() {
-                return $.pivotUtilities.aggregators[defaultValues.aggregatorName](defaultValues.vals);
+            var getAggregator = function (aggregatorName,vals) {
+                return $.pivotUtilities.aggregators[aggregatorName](vals);
             }
 
-            function getRenderer() {
-                if($.inArray(defaultValues.rendererName, ['Table','Table Barchart','Heatmap','Row Heatmap','Col Heatmap']) > -1)
-                    return nrecoPivotExt.wrapTableRenderer($.pivotUtilities.renderers[defaultValues.rendererName]);
-                if($.inArray(defaultValues.rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
-                    return $.pivotUtilities.c3_renderers[defaultValues.rendererName];
+            var getRenderer = function(rendererName) {
+                if($.inArray(rendererName, ['Table','Table Barchart','Heatmap','Row Heatmap','Col Heatmap']) > -1)
+                    return nrecoPivotExt.wrapTableRenderer($.pivotUtilities.renderers[rendererName]);
+                if($.inArray(rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
+                    return $.pivotUtilities.c3_renderers[rendererName];
             }
 
+            // this function keeps parameters that may be configured by the user with pivotUI
+            var getPivotUIState = function (pivotOpts) {
+                var props = ["aggregatorName","cols","vals","rendererName","rows"];
+                var opts = {};
+                for (var pIdx = 0; pIdx < props.length; pIdx++) {
+                    var p = props[pIdx];
+                    opts[p] = pivotOpts[p];
+                }
+                if (pivotOpts.rendererOptions && pivotOpts.rendererOptions.sort) {
+                    opts.rendererOptions = {
+                        sort: pivotOpts.rendererOptions.sort
+                    };
+                }
+                return opts;
+            };
 
-
-            function getQueryData() {
-                return  {
-                    fromDate: moment().diff(getStartDate(),'days'),
-                    toDate: moment().diff(getEndDate(),'days'),
-                    hourDiff: moment().diff($('#daterange').data('daterangepicker').startDate,'hours') + 1,
-                    customer : $('#customer').select2('data'),
-                    vendor : $('#vendor').select2('data'),
-                    ingressCountryId : $('#icountry').select2('data'),
-                    ingressOperatorId : $('#ioperator').select2('data'),
-                    egressCountryId : $('#ecountry').select2('data'),
-                    egressOperatorId : $('#eoperator').select2('data'),
-                    pivotTemplate : JSON.stringify(defaultValues),
-                    hourly: $("#groupType").is(':checked'),
-                    ui: $("#ui").is(':checked'),
-                    compareDates : $('#compareDates').is(':checked')
-                };
+            var getPivotState = function (pivotUIState) {
+                var pivotState = {}
+                pivotState.aggregator =  getAggregator(pivotUIState.aggregatorName || 'Sum',pivotUIState.vals || ['ceiledDuration']);
+                pivotState.cols = pivotUIState.cols;
+                pivotState.rows = pivotUIState.rows;
+                pivotState.renderer = getRenderer(pivotUIState.rendererName || 'Table')
+                pivotState.rendererOptions = pivotUIState.rendererOptions;
+                return pivotState;
             }
+
+            var pivotUIState = {};
 
             var jsonData = [{attempts:0,connected:0,ceiledDuration:0,startDate:'1/1/1990','sigHour':0,customer:0,vendor:0,ingressCountry:0,ingressOperator:0,egressCountry:0, egressOperator:0}];
 
             function reloadPivot() {
                 if( $("#uiEdit").hasClass("uiEdit")) {
                     $("#pivotTable").pivotUI(
-                        jsonData, {
+                        jsonData, $.extend({
                             renderers: wrappedRenderers,
-                            aggregatorName: defaultValues.aggregatorName,
-                            vals: defaultValues.vals ,
-                            cols: defaultValues.cols,
-                            rows : defaultValues.rows,
-                            rendererName : defaultValues.rendererName,
-                            rendererOptions: defaultValues.options,
-                            exclusions : defaultValues.exclusions,
+                            vals: ['ceiledDuration'],
+                            aggregatorName: 'Sum',
                             unusedAttrsVertical: true,
                             hiddenAttributes: [],
                             derivedAttributes: {
@@ -269,25 +291,14 @@
                                 $('#pivotTable select.pvtAggregator:not(.form-control), #pivotTable select.pvtRenderer:not(.form-control)').addClass('form-control input-sm');
                                 $('#pivotTable>table:not(.table)').addClass('table');
 
-                                defaultValues.aggregatorName = pivotUIOptions.aggregatorName;
-                                defaultValues.vals = pivotUIOptions.vals;
-                                defaultValues.cols = pivotUIOptions.cols;
-                                defaultValues.rows = pivotUIOptions.rows;
-                                defaultValues.rendererName = pivotUIOptions.rendererName;
-                                defaultValues.exclusions = pivotUIOptions.exclusions;
-                                defaultValues.options = pivotUIOptions.rendererOptions;
+                                pivotUIState = getPivotUIState(pivotUIOptions);
                             }
-                        },true);
+                        },pivotUIState),true);
                 }
                 else {
 
                     $("#pivotTable").pivot(
-                        jsonData, {
-                            aggregator: getAggregator(),
-                            cols: defaultValues.cols,
-                            rows : defaultValues.rows,
-                            renderer :  getRenderer(),
-                            rendererOptions: defaultValues.options,
+                        jsonData, $.extend({
                             derivedAttributes: {
                                 "year":       dateFormat("sigDate", "%y", true),
                                 "month":      dateFormat("sigDate", "%m", true),
@@ -304,22 +315,15 @@
                                 }
                             },
                             filter: function(record) {
-                                var exclusions = defaultValues.exclusions;
-                                for (var property in exclusions) {
-                                    if (exclusions.hasOwnProperty(property) && record.hasOwnProperty(property)) {
-                                        if($.inArray(record[property], exclusions[property]) > -1) {
-                                            return false;
-                                        }
-                                    }
-                                }
                                 return true;
                             }
-                        });
+                        },getPivotState(pivotUIState)));
                 }
             }
 
             function reloadData() {
-
+                var el = $("#result");
+                blockUI(el);
                 var response = $.ajax({
                     "url" : '/api/group',
                     "type" : "POST",
@@ -341,6 +345,7 @@
                 response.done(function(json) {
                     jsonData = json;
                     reloadPivot();
+                    unblockUI(el);
                 });
 
                 response.always(function(){
@@ -350,9 +355,12 @@
                 response.fail(function(error){
 
                 });
+
+                return response;
             }
 
-            $('#search').on('click', function() {
+            $('#search').on('click', function(event) {
+                event.preventDefault();
                 reloadData();
             });
 
@@ -376,6 +384,88 @@
                     reloadPivot();
                 }
             });
+
+            var getReportData = function () {
+
+                return  {
+                    fromDate: moment().diff(getStartDate(),'days'),
+                    toDate: moment().diff(getEndDate(),'days'),
+                    hourDiff: moment().diff($('#daterange').data('daterangepicker').startDate,'hours') + 1,
+                    customer : $('#customer').select2('data'),
+                    vendor : $('#vendor').select2('data'),
+                    ingressCountryId : $('#icountry').select2('data'),
+                    ingressOperatorId : $('#ioperator').select2('data'),
+                    egressCountryId : $('#ecountry').select2('data'),
+                    egressOperatorId : $('#eoperator').select2('data'),
+                    pivotTemplate : pivotUIState,
+                    hourly: $("#groupType").is(':checked'),
+                    uiEdit: $("#uiEdit").is(':checked')
+                };
+            }
+
+            $('#saveReport').click(function () {
+                var response = $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: '/api/pivotTemplates',
+                    data: JSON.stringify({
+                        templateName: $('#reportName').val(),
+                        templateData: JSON.stringify(getReportData())
+                    })
+                });
+
+                response.done(function(result) {
+                    $.notify('Report has been save/updated successfully', 'success');
+                });
+            });
+
+            $(document).on("click", '.widget .reload', function (event) {
+                event.preventDefault();
+                reloadData();
+            });
+
+            $('#pivotTemplate').select2({
+               // theme: 'bootstrap'
+            });
+
+            $('#pivotTemplate').on('select2:select', function (e) {
+                var data = JSON.parse(e.params.data.id);
+                console.log(data);
+                //pivotUIState = JSON.parse(e.added.pivotTemplate);
+
+                //document.title = e.added.text;
+                //history.pushState('', e.added.text, "?template=" + e.added.text);
+
+                if( data.hourDiff < 5 ) {
+                    $('#daterange').data('daterangepicker').setStartDate(moment().subtract(data.fromDate,'days').subtract(data.hourDiff,'hours'));
+                    $('#daterange').data('daterangepicker').setEndDate(moment().endOf('day').subtract(data.toDate,'days'));
+                } else {
+                    $('#daterange').data('daterangepicker').setStartDate(moment().startOf('day').subtract(data.fromDate,'days'));
+                    $('#daterange').data('daterangepicker').setEndDate(moment().endOf('day').subtract(data.toDate,'days'));
+                }
+
+//                jQuery.each(data.customer,function (index, value) {
+//                    console.log(value);
+//                    $('#customer').append(new Option(value.text,value.id,false,false));
+//                });
+
+                var option = new Option(data.customer[0].text,data.customer[0].id,true,true);
+                $('#customer').append(option).trigger('change');
+
+
+                $('#vendor').select2('data', data.vendor);
+                $('#icountry').select2('data', data.ingressCountryId);
+                $('#ioperator').select2('data', data.ingressOperatorId);
+                $('#ecountry').select2('data', data.egressCountryId);
+                $('#eoperator').select2('data', data.egressOperatorId);
+
+                pivotUIState = data.pivotTemplate;
+
+                $("#groupType").prop('checked',data.hourly);
+                //$("#ui").prop('checked',data.ui);
+                reloadData();
+            });
+
 
         });
         // ]]>
