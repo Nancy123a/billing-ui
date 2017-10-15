@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html layout:decorator="layout"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
+<head>
+    <title>Custom Reports</title>
+    <link th:href="@{/assets/libs/date-range-picker/css/daterangepicker.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2-bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/pivottable/pivot.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/pivottable/nrecopivottableext.css}" rel="stylesheet" type="text/css" />
+    <style>
+        /* styles for responsive pivot UI + bootstrap-like styles */
+
+        .pivotHolder table.pvtUi {
+            table-layout:fixed;
+        }
+        .pivotHolder select {
+            visibility:hidden;
+        }
+        .pivotHolder select.form-control {
+            visibility:visible;
+        }
+
+        .pivotHolder > table.pvtUi, .pivotHolder table.pvtTable {
+            width:100%;
+            margin-bottom:0px;
+        }
+        .pivotHolder > table.pvtUi>tbody>tr>td, .pivotHolder > table.pvtUi>tbody>tr>th {
+            border: 1px solid #ddd;
+        }
+        .pivotHolder .pvtAxisContainer li span.pvtAttr {
+            height:auto;
+            white-space:nowrap;
+        }
+        .pivotHolder .pvtAxisContainer.pvtUnused, .pivotHolder .pvtAxisContainer.pvtCols {
+            vertical-align:middle;
+        }
+
+        .pivotHolder > table.pvtUi>tbody>tr:first-child > td:first-child {
+            width:250px;
+        }
+
+        .pivotHolder td.pvtRendererArea {
+            padding-bottom:0px;
+            padding-right:0px;
+            border-bottom-width:0px !important;
+            border-right-width:0px !important;
+        }
+        .pivotHolder td.pvtVals br { display:none; }
+
+        .pvtRendererArea>div {
+            overflow:auto;
+        }
+
+        .pvtTableRendererHolder {
+            max-height:600px;  /* limit table height if needed */
+        }
+
+        .uiEdit > i {
+            color: #65BD77;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Heading Start -->
+    <div class="page-heading">
+        <h1><i class='fa fa-file'></i> Pivot Table</h1>
+        <h3>General Custom Reports from CDRs</h3>
+    </div>
+    <!-- Page Heading End-->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="widget">
+                <div class="widget-header">
+                    <h2>Search Criteria</h2>
+                    <div class="additional-btn">
+                        <a href="#" class=""><i class="icon-search"></i> </a>
+                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content padding">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="daterange">Date</label>
+                            <input class="form-control" id="daterange" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="customer">Customer</label>
+                            <select class="form-control" id="customer" ></select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="vendor">Vendor</label>
+                            <select class="form-control" id="vendor" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ecountry">Egress Country</label>
+                            <select class="form-control" id="ecountry" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="eoperator">Egress Operator</label>
+                            <select class="form-control" id="eoperator" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="icountry">Ingress Country</label>
+                            <select class="form-control" id="icountry" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ioperator">Ingress Operator</label>
+                            <select class="form-control" id="ioperator" />
+                        </div>
+                        <div class="col-lg-1">
+                            <label for="groupType">Hourly</label>
+                            <input type="checkbox" id="groupType" class="ios-switch ios-switch-success" />
+                        </div>
+                        <div class="col-lg-2">
+                            <label for="search">.</label>
+                            <button class="form-control btn btn-info" id="search" type="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="widget">
+                <div class="widget-header">
+                    <h2>Result</h2>
+                    <div class="additional-btn">
+                        <a id="uiEdit" ><i class="icon-edit"></i> </a>
+                        <a data-target="#saveModal" data-toggle="modal" title="Save Report"><i class="icon-floppy"></i> </a>
+                        <a href="#" class=""><i class="icon-search"></i> </a>
+                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div style="overflow: auto;">
+                        <div id="pivotTable" class="pivotHolder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div layout:fragment="script">
+    <script th:src="@{/assets/libs/moment/moment.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone-data.min.js}"></script>
+    <script th:src="@{/assets/libs/date-range-picker/js/daterangepicker.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.extended-ajax.js}"></script>
+    <script th:src="@{/assets/js/pages/domain.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/pivot.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/export_renderers.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/nrecopivottableext.js}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+    <script th:src="@{/assets/libs/pivottable/c3_renderers.min.js}"></script>
+
+
+    <script>
+        // <![CDATA[
+        $(function() {
+            var dateFormat =       $.pivotUtilities.derivers.dateFormat;
+            var sortAs =           $.pivotUtilities.sortAs;
+            var tpl =              $.pivotUtilities.aggregatorTemplates;
+
+            var defaultValues = {
+                aggregatorName : 'Sum',
+                vals : ['ceiledDuration'],
+                cols : [],
+                rows : [],
+                rendererName : 'Table',
+                exclusions : {},
+                options: { sort: null }
+            }
+
+
+            var nrecoPivotExt = new NRecoPivotTableExtensions({
+                wrapWith: '<div class="pvtTableRendererHolder"></div>',  // special div is needed by fixed headers when used with pivotUI
+                fixedHeaders : true
+            });
+
+            $.extend({}, $.pivotUtilities.renderers,$.pivotUtilities.c3_renderers);
+
+            var stdRendererNames = ["Table","Table Barchart","Heatmap","Row Heatmap","Col Heatmap"];
+            var wrappedRenderers = $.extend( {}, $.pivotUtilities.renderers,$.pivotUtilities.c3_renderers);
+            $.each(stdRendererNames, function() {
+                var rName = this;
+                wrappedRenderers[rName] = nrecoPivotExt.wrapTableRenderer(wrappedRenderers[rName]);
+            });
+
+
+            function getAggregator() {
+                return $.pivotUtilities.aggregators[defaultValues.aggregatorName](defaultValues.vals);
+            }
+
+            function getRenderer() {
+                if($.inArray(defaultValues.rendererName, ['Table','Table Barchart','Heatmap','Row Heatmap','Col Heatmap']) > -1)
+                    return nrecoPivotExt.wrapTableRenderer($.pivotUtilities.renderers[defaultValues.rendererName]);
+                if($.inArray(defaultValues.rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
+                    return $.pivotUtilities.c3_renderers[defaultValues.rendererName];
+            }
+
+
+
+            function getQueryData() {
+                return  {
+                    fromDate: moment().diff(getStartDate(),'days'),
+                    toDate: moment().diff(getEndDate(),'days'),
+                    hourDiff: moment().diff($('#daterange').data('daterangepicker').startDate,'hours') + 1,
+                    customer : $('#customer').select2('data'),
+                    vendor : $('#vendor').select2('data'),
+                    ingressCountryId : $('#icountry').select2('data'),
+                    ingressOperatorId : $('#ioperator').select2('data'),
+                    egressCountryId : $('#ecountry').select2('data'),
+                    egressOperatorId : $('#eoperator').select2('data'),
+                    pivotTemplate : JSON.stringify(defaultValues),
+                    hourly: $("#groupType").is(':checked'),
+                    ui: $("#ui").is(':checked'),
+                    compareDates : $('#compareDates').is(':checked')
+                };
+            }
+
+            var jsonData = [{attempts:0,connected:0,ceiledDuration:0,startDate:'1/1/1990','sigHour':0,customer:0,vendor:0,ingressCountry:0,ingressOperator:0,egressCountry:0, egressOperator:0}];
+
+            function reloadPivot() {
+                if( $("#uiEdit").hasClass("uiEdit")) {
+                    $("#pivotTable").pivotUI(
+                        jsonData, {
+                            renderers: wrappedRenderers,
+                            aggregatorName: defaultValues.aggregatorName,
+                            vals: defaultValues.vals ,
+                            cols: defaultValues.cols,
+                            rows : defaultValues.rows,
+                            rendererName : defaultValues.rendererName,
+                            rendererOptions: defaultValues.options,
+                            exclusions : defaultValues.exclusions,
+                            unusedAttrsVertical: true,
+                            hiddenAttributes: [],
+                            derivedAttributes: {
+                                "year":       dateFormat("sigDate", "%y", true),
+                                "month":      dateFormat("sigDate", "%m", true),
+                                "day":        dateFormat("sigDate", "%d", true),
+                                "month name": dateFormat("sigDate", "%n", true),
+                                "day name":   dateFormat("sigDate", "%w", true)
+                            },
+                            sorters: function(attr) {
+                                if(attr == "month name") {
+                                    return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                                }
+                                if(attr == "day name") {
+                                    return sortAs(["Mon","Tue","Wed", "Thu","Fri","Sat","Sun"]);
+                                }
+                            },
+                            onRefresh: function (pivotUIOptions) {
+                                // this is correct way to apply fixed headers with pivotUI
+                                nrecoPivotExt.initFixedHeaders($('#pivotTable table.pvtTable'));
+
+                                // apply boostrap styles to pvt UI controls
+                                $('#pivotTable select.pvtAttrDropdown:not(.form-control)').addClass('form-control input-sm');
+                                $('#pivotTable select.pvtAggregator:not(.form-control), #pivotTable select.pvtRenderer:not(.form-control)').addClass('form-control input-sm');
+                                $('#pivotTable>table:not(.table)').addClass('table');
+
+                                defaultValues.aggregatorName = pivotUIOptions.aggregatorName;
+                                defaultValues.vals = pivotUIOptions.vals;
+                                defaultValues.cols = pivotUIOptions.cols;
+                                defaultValues.rows = pivotUIOptions.rows;
+                                defaultValues.rendererName = pivotUIOptions.rendererName;
+                                defaultValues.exclusions = pivotUIOptions.exclusions;
+                                defaultValues.options = pivotUIOptions.rendererOptions;
+                            }
+                        },true);
+                }
+                else {
+
+                    $("#pivotTable").pivot(
+                        jsonData, {
+                            aggregator: getAggregator(),
+                            cols: defaultValues.cols,
+                            rows : defaultValues.rows,
+                            renderer :  getRenderer(),
+                            rendererOptions: defaultValues.options,
+                            derivedAttributes: {
+                                "year":       dateFormat("sigDate", "%y", true),
+                                "month":      dateFormat("sigDate", "%m", true),
+                                "day":        dateFormat("sigDate", "%d", true),
+                                "month name": dateFormat("sigDate", "%n", true),
+                                "day name":   dateFormat("sigDate", "%w", true)
+                            },
+                            sorters: function(attr) {
+                                if(attr == "month name") {
+                                    return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                                }
+                                if(attr == "day name") {
+                                    return sortAs(["Mon","Tue","Wed", "Thu","Fri","Sat","Sun"]);
+                                }
+                            },
+                            filter: function(record) {
+                                var exclusions = defaultValues.exclusions;
+                                for (var property in exclusions) {
+                                    if (exclusions.hasOwnProperty(property) && record.hasOwnProperty(property)) {
+                                        if($.inArray(record[property], exclusions[property]) > -1) {
+                                            return false;
+                                        }
+                                    }
+                                }
+                                return true;
+                            }
+                        });
+                }
+            }
+
+            function reloadData() {
+
+                var response = $.ajax({
+                    "url" : '/api/group',
+                    "type" : "POST",
+                    "contentType" : 'application/json',
+                    "data": JSON.stringify({
+                        fromDate: getStartDate(),
+                        toDate: getEndDate(),
+                        customer: $('#customer').select2('val') || [],
+                        vendor: $('#vendor').select2('val') || [],
+                        ingressCountryId: $('#icountry').select2('val') || [],
+                        ingressOperatorId: $('#ioperator').select2('val') || [],
+                        egressCountryId: $('#ecountry').select2('val') || [],
+                        egressOperatorId: $('#eoperator').select2('val') || [],
+                        hourly: $('#groupType').is(':checked'),
+                        compareDates: $('#compareDates').is(':checked')
+                    })
+                });
+
+                response.done(function(json) {
+                    jsonData = json;
+                    reloadPivot();
+                });
+
+                response.always(function(){
+                  //  $('#widgetPivot').trigger('reloaded.ace.widget');
+                });
+
+                response.fail(function(error){
+
+                });
+            }
+
+            $('#search').on('click', function() {
+                reloadData();
+            });
+
+            function getStartDate() {
+                var date = $('#daterange').data('daterangepicker').startDate;
+                return date.format('YYYY-MM-DDTHH:00:00');
+            }
+
+            function getEndDate() {
+                var date = $('#daterange').data('daterangepicker').endDate;
+                return date.format('YYYY-MM-DDTHH:00:00');
+            }
+
+            $("#uiEdit").click(function(){
+                if($(this).hasClass("uiEdit")){
+                    $(this).removeClass("uiEdit");
+                    reloadPivot();
+                }
+                else{
+                    $(this).addClass("uiEdit");
+                    reloadPivot();
+                }
+            });
+
+        });
+        // ]]>
+    </script>
+</div>
+</body>
+</html>

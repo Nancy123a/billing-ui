@@ -12,6 +12,11 @@ public class DefaultController {
         return new ModelAndView("member/reports/statistics");
     }
 
+    @GetMapping("/reports/custom")
+    public ModelAndView custom() {
+        return new ModelAndView("member/reports/custom");
+    }
+
 
     @GetMapping({"/","/dashboard"})
     public ModelAndView dashboard() {
