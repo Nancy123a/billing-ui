@@ -15,7 +15,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 public interface CountryRepository extends JpaRepository<Country, Integer>,QueryDslPredicateExecutor<Country>,QuerydslBinderCustomizer<QCountry> {
     @RestResource(path = "findByCountryName", rel = "findByCountryName")
-    Page<Country> findByCountryName(@Param("countryName") String countryName, Pageable pageable);
+    Page<Country> findByCountryNameContainingIgnoreCase(@Param("countryName") String countryName, Pageable pageable);
 
     default void customize(QuerydslBindings bindings, QCountry qCountry)
     {
