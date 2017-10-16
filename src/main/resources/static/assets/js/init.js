@@ -254,9 +254,9 @@ $('input:not(.ios-switch)').iCheck({
 });
 
 // IOS7 SWITCH
-$(".ios-switch").each(function(){
-    mySwitch = new Switch(this);
-});
+// $(".ios-switch").each(function(){
+//     mySwitch = new Switch(this);
+// });
 
 //GALLERY
 $('.gallery-wrap').each(function() { // the containers for all your galleries

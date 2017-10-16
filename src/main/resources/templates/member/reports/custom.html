@@ -386,7 +386,6 @@
             });
 
             var getReportData = function () {
-
                 return  {
                     fromDate: moment().diff(getStartDate(),'days'),
                     toDate: moment().diff(getEndDate(),'days'),
@@ -398,8 +397,8 @@
                     egressCountryId : $('#ecountry').select2('data'),
                     egressOperatorId : $('#eoperator').select2('data'),
                     pivotTemplate : pivotUIState,
-                    hourly: $("#groupType").is(':checked'),
-                    uiEdit: $("#uiEdit").is(':checked')
+                    hourly: $("#groupType").prop(':checked'),
+                    uiEdit: $("#uiEdit").hasClass("uiEdit")
                 };
             }
 
@@ -425,12 +424,14 @@
             });
 
             $('#pivotTemplate').select2({
-               // theme: 'bootstrap'
+                placeholder: 'Select Report',
+                allowClear: true
             });
+            // To show empty report
+            $('#pivotTemplate').val(null).trigger('change');
 
             $('#pivotTemplate').on('select2:select', function (e) {
                 var data = JSON.parse(e.params.data.id);
-                console.log(data);
                 //pivotUIState = JSON.parse(e.added.pivotTemplate);
 
                 //document.title = e.added.text;
@@ -444,27 +445,41 @@
                     $('#daterange').data('daterangepicker').setEndDate(moment().endOf('day').subtract(data.toDate,'days'));
                 }
 
-//                jQuery.each(data.customer,function (index, value) {
-//                    console.log(value);
-//                    $('#customer').append(new Option(value.text,value.id,false,false));
-//                });
 
-                var option = new Option(data.customer[0].text,data.customer[0].id,true,true);
-                $('#customer').append(option).trigger('change');
-
-
-                $('#vendor').select2('data', data.vendor);
-                $('#icountry').select2('data', data.ingressCountryId);
-                $('#ioperator').select2('data', data.ingressOperatorId);
-                $('#ecountry').select2('data', data.egressCountryId);
-                $('#eoperator').select2('data', data.egressOperatorId);
+                updateSelect2($('#customer'),data.customer);
+                updateSelect2($('#vendor'),data.vendor);
+                updateSelect2($('#icountry'), data.ingressCountryId);
+                updateSelect2($('#ioperator'), data.ingressOperatorId);
+                updateSelect2($('#ecountry'), data.egressCountryId);
+                updateSelect2($('#eoperator'), data.egressOperatorId);
 
                 pivotUIState = data.pivotTemplate;
+                if(data.hourly)
+                    groupType.turnOn();
+                else
+                    groupType.turnOff();
 
-                $("#groupType").prop('checked',data.hourly);
-                //$("#ui").prop('checked',data.ui);
+                if(data.uiEdit)
+                    $("#uiEdit").addClass("uiEdit");
+                else
+                    $("#uiEdit").removeClass("uiEdit");
+
                 reloadData();
             });
+
+            var groupType;
+            $(".ios-switch").each(function(){
+                 groupType = new Switch(this);
+            });
+
+            var updateSelect2 = function (el, data) {
+                el.val(null);
+                jQuery.each(data,function (index, value) {
+                    var option = new Option(value.text,value.id,true,true);
+                    el.append(option);
+                });
+                el.trigger('change');
+            }
 
 
         });
