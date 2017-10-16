@@ -115,6 +115,13 @@
 				<configuration>
 					<executable>true</executable>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.springframework.boot.experimental</groupId>
+						<artifactId>spring-boot-thin-layout</artifactId>
+						<version>1.0.6.RELEASE</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>com.mysema.maven</groupId>
