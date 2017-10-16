@@ -247,11 +247,11 @@ $('.datepicker-input').datepicker();
 
 
 //ICHECK
-$('input:not(.ios-switch)').iCheck({
-  checkboxClass: 'icheckbox_square-aero',
-  radioClass: 'iradio_square-aero',
-  increaseArea: '20%' // optional
-});
+// $('input:not(.ios-switch)').iCheck({
+//   checkboxClass: 'icheckbox_square-aero',
+//   radioClass: 'iradio_square-aero',
+//   increaseArea: '20%' // optional
+// });
 
 // IOS7 SWITCH
 // $(".ios-switch").each(function(){
