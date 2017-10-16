@@ -79,7 +79,7 @@
                 <div class="widget-header">
                     <h2>Search Criteria</h2>
                     <div class="additional-btn">
-                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+                        <a href="#" class="widget-toggle"><i class="fa fa-chevron-down"></i></a>
                     </div>
                 </div>
                 <div class="widget-content padding">
@@ -134,14 +134,14 @@
                     <h2>Result</h2>
                     <div class="additional-btn">
 
-                        <a class="hidden reload"><i class="icon-ccw-1"></i></a>
-                        <a class="hidden" id="uiEdit" ><i class="icon-edit"></i> </a>
-                        <a class="hidden" data-target="#saveModal" data-toggle="modal" title="Save Report"><i class="icon-floppy"></i> </a>
+                        <a class="hidden reload"><i class="fa fa-refresh"></i></a>
+                        <a class="hidden" id="uiEdit" ><i class="fa fa-pencil"></i> </a>
+                        <a class="hidden" data-target="#saveModal" data-toggle="modal" title="Save Report"><i class="fa fa-floppy-o"></i> </a>
                         <select id="pivotTemplate">
                             <option th:each="template : ${templates}"
                                     th:value="${template.templateData}" th:text="${template.templateName}"></option>
                         </select>
-                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+                        <a href="#" class="widget-toggle"><i class="fa fa-chevron-down"></i></a>
                     </div>
                 </div>
                 <div class="widget-content">

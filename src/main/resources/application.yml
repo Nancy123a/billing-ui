@@ -23,7 +23,7 @@ spring:
      tomcat:
        test-on-borrow: true
        validation-query: SELECT 1
-       initial-size: 3
+       initial-size: 1
   jpa:
     show-sql: true
     hibernate:
