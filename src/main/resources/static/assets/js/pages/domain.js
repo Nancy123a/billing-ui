@@ -2,16 +2,6 @@ $(function() {
 
     moment.tz.setDefault("UTC");
 
-    function getStartDate() {
-        var date = $('#daterange').data('daterangepicker').startDate;
-        return date.format('YYYY-MM-DDTHH:00:00');
-    }
-
-    function getEndDate() {
-        var date = $('#daterange').data('daterangepicker').endDate;
-        return date.format('YYYY-MM-DDTHH:00:00');
-    }
-
     $('#daterange').daterangepicker({
         startDate: moment().startOf('day'),
         endDate: moment().endOf('day'),

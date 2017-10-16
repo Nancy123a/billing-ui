@@ -91,7 +91,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="widget">
+            <div id="result" class="widget">
                 <div class="widget-header">
                     <h2>Result</h2>
                     <div class="additional-btn">
@@ -167,6 +167,16 @@
     <script>
         // <![CDATA[
         $(function() {
+
+            function getStartDate() {
+                var date = $('#daterange').data('daterangepicker').startDate;
+                return date.format('YYYY-MM-DDTHH:00:00');
+            }
+
+            function getEndDate() {
+                var date = $('#daterange').data('daterangepicker').endDate;
+                return date.format('YYYY-MM-DDTHH:00:00');
+            }
 
             var url = '';
 
@@ -311,6 +321,8 @@
             });
 
             function reloadAjax() {
+                var el = $("#result");
+                blockUI(el);
                 url = '/api/group';
                 if ($('#groupType').is(':checked'))
                     oTable.column('sigHour:name').visible(true);
@@ -348,7 +360,9 @@
                 else
                     oTable.column('eoperator:name').visible(false);
 
-                oTable.ajax.reload();
+                oTable.ajax.reload(function (json) {
+                    unblockUI(el);
+                });
             }
 
             $('#search').click(function () {
@@ -420,6 +434,11 @@
                         ''
                     );
                 }
+            });
+
+            var groupType;
+            $(".ios-switch").each(function(){
+                groupType = new Switch(this);
             });
 
         });
