@@ -25,7 +25,7 @@ spring:
        validation-query: SELECT 1
        initial-size: 3
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
     generate-ddl: false

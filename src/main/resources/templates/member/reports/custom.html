@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html layout:decorator="layout"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
+<head>
+    <title>Custom Reports</title>
+    <link th:href="@{/assets/libs/date-range-picker/css/daterangepicker.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2-bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/pivottable/pivot.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/pivottable/nrecopivottableext.css}" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css" rel="stylesheet" />
+    <style>
+        /* styles for responsive pivot UI + bootstrap-like styles */
+
+        .pivotHolder table.pvtUi {
+            table-layout:fixed;
+        }
+        .pivotHolder select {
+            visibility:hidden;
+        }
+        .pivotHolder select.form-control {
+            visibility:visible;
+        }
+
+        .pivotHolder > table.pvtUi, .pivotHolder table.pvtTable {
+            width:100%;
+            margin-bottom:0px;
+        }
+        .pivotHolder > table.pvtUi>tbody>tr>td, .pivotHolder > table.pvtUi>tbody>tr>th {
+            border: 1px solid #ddd;
+        }
+        .pivotHolder .pvtAxisContainer li span.pvtAttr {
+            height:auto;
+            white-space:nowrap;
+        }
+        .pivotHolder .pvtAxisContainer.pvtUnused, .pivotHolder .pvtAxisContainer.pvtCols {
+            vertical-align:middle;
+        }
+
+        .pivotHolder > table.pvtUi>tbody>tr:first-child > td:first-child {
+            width:250px;
+        }
+
+        .pivotHolder td.pvtRendererArea {
+            padding-bottom:0px;
+            padding-right:0px;
+            border-bottom-width:0px !important;
+            border-right-width:0px !important;
+        }
+        .pivotHolder td.pvtVals br { display:none; }
+
+        .pvtRendererArea>div {
+            overflow:auto;
+        }
+
+        .pvtTableRendererHolder {
+            max-height:600px;  /* limit table height if needed */
+        }
+
+        .uiEdit > i {
+            color: #65BD77;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Heading Start -->
+    <div class="page-heading">
+        <h1><i class='fa fa-file'></i> Pivot Table</h1>
+        <h3>General Custom Reports from CDRs</h3>
+    </div>
+    <!-- Page Heading End-->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="widget">
+                <div class="widget-header">
+                    <h2>Search Criteria</h2>
+                    <div class="additional-btn">
+                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content padding">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="daterange">Date</label>
+                            <input class="form-control" id="daterange" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="customer">Customer</label>
+                            <select class="form-control" id="customer" ></select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="vendor">Vendor</label>
+                            <select class="form-control" id="vendor" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ecountry">Egress Country</label>
+                            <select class="form-control" id="ecountry" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label for="eoperator">Egress Operator</label>
+                            <select class="form-control" id="eoperator" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="icountry">Ingress Country</label>
+                            <select class="form-control" id="icountry" />
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="ioperator">Ingress Operator</label>
+                            <select class="form-control" id="ioperator" />
+                        </div>
+                        <div class="col-lg-1">
+                            <label for="groupType">Hourly</label>
+                            <input type="checkbox" id="groupType" class="ios-switch ios-switch-success" />
+                        </div>
+                        <div class="col-lg-2">
+                            <label for="search">.</label>
+                            <button class="form-control btn btn-info" id="search" type="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="result" class="widget">
+                <div class="widget-header">
+                    <h2>Result</h2>
+                    <div class="additional-btn">
+
+                        <a class="hidden reload"><i class="icon-ccw-1"></i></a>
+                        <a class="hidden" id="uiEdit" ><i class="icon-edit"></i> </a>
+                        <a class="hidden" data-target="#saveModal" data-toggle="modal" title="Save Report"><i class="icon-floppy"></i> </a>
+                        <select id="pivotTemplate">
+                            <option th:each="template : ${templates}"
+                                    th:value="${template.templateData}" th:text="${template.templateName}"></option>
+                        </select>
+                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div style="overflow: auto;">
+                        <div id="pivotTable" class="pivotHolder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="saveModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title text-center" id="myModalLabel">Manage Report</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="reportName" class="col-sm-3 control-label">Report Name</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" id="reportName" placeholder="Give report a name" type="text" />
+                            <p class="help-block">If report name <strong>exist</strong> report will be updated !</p>
+                        </div>
+                        <br />
+                        <br />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveReport" type="button" data-dismiss="modal" class="btn btn-success">Save/Update</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+<div layout:fragment="script">
+    <script th:src="@{/assets/libs/moment/moment.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone-data.min.js}"></script>
+    <script th:src="@{/assets/libs/date-range-picker/js/daterangepicker.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.extended-ajax.js}"></script>
+    <script th:src="@{/assets/js/pages/domain.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/pivot.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/export_renderers.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/nrecopivottableext.js}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+    <script th:src="@{/assets/libs/pivottable/c3_renderers.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-notifyjs/notify.min.js}"></script>
+
+    <script>
+        // <![CDATA[
+        $(function() {
+            var dateFormat =       $.pivotUtilities.derivers.dateFormat;
+            var sortAs =           $.pivotUtilities.sortAs;
+            var tpl =              $.pivotUtilities.aggregatorTemplates;
+
+
+            var nrecoPivotExt = new NRecoPivotTableExtensions({
+                wrapWith: '<div class="pvtTableRendererHolder"></div>',  // special div is needed by fixed headers when used with pivotUI
+                fixedHeaders : true
+            });
+
+            $.extend({}, $.pivotUtilities.renderers,$.pivotUtilities.c3_renderers);
+
+            var stdRendererNames = ["Table","Table Barchart","Heatmap","Row Heatmap","Col Heatmap"];
+            var wrappedRenderers = $.extend( {}, $.pivotUtilities.renderers,$.pivotUtilities.c3_renderers);
+            $.each(stdRendererNames, function() {
+                var rName = this;
+                wrappedRenderers[rName] = nrecoPivotExt.wrapTableRenderer(wrappedRenderers[rName]);
+            });
+
+
+            var getAggregator = function (aggregatorName,vals) {
+                return $.pivotUtilities.aggregators[aggregatorName](vals);
+            }
+
+            var getRenderer = function(rendererName) {
+                if($.inArray(rendererName, ['Table','Table Barchart','Heatmap','Row Heatmap','Col Heatmap']) > -1)
+                    return nrecoPivotExt.wrapTableRenderer($.pivotUtilities.renderers[rendererName]);
+                if($.inArray(rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
+                    return $.pivotUtilities.c3_renderers[rendererName];
+            }
+
+            // this function keeps parameters that may be configured by the user with pivotUI
+            var getPivotUIState = function (pivotOpts) {
+                var props = ["aggregatorName","cols","vals","rendererName","rows"];
+                var opts = {};
+                for (var pIdx = 0; pIdx < props.length; pIdx++) {
+                    var p = props[pIdx];
+                    opts[p] = pivotOpts[p];
+                }
+                if (pivotOpts.rendererOptions && pivotOpts.rendererOptions.sort) {
+                    opts.rendererOptions = {
+                        sort: pivotOpts.rendererOptions.sort
+                    };
+                }
+                return opts;
+            };
+
+            var getPivotState = function (pivotUIState) {
+                var pivotState = {}
+                pivotState.aggregator =  getAggregator(pivotUIState.aggregatorName || 'Sum',pivotUIState.vals || ['ceiledDuration']);
+                pivotState.cols = pivotUIState.cols;
+                pivotState.rows = pivotUIState.rows;
+                pivotState.renderer = getRenderer(pivotUIState.rendererName || 'Table')
+                pivotState.rendererOptions = pivotUIState.rendererOptions;
+                return pivotState;
+            }
+
+            var pivotUIState = {};
+
+            var jsonData = [{attempts:0,connected:0,ceiledDuration:0,startDate:'1/1/1990','sigHour':0,customer:0,vendor:0,ingressCountry:0,ingressOperator:0,egressCountry:0, egressOperator:0}];
+
+            function reloadPivot() {
+                if( $("#uiEdit").hasClass("uiEdit")) {
+                    $("#pivotTable").pivotUI(
+                        jsonData, $.extend({
+                            renderers: wrappedRenderers,
+                            vals: ['ceiledDuration'],
+                            aggregatorName: 'Sum',
+                            unusedAttrsVertical: true,
+                            hiddenAttributes: [],
+                            derivedAttributes: {
+                                "year":       dateFormat("sigDate", "%y", true),
+                                "month":      dateFormat("sigDate", "%m", true),
+                                "day":        dateFormat("sigDate", "%d", true),
+                                "month name": dateFormat("sigDate", "%n", true),
+                                "day name":   dateFormat("sigDate", "%w", true)
+                            },
+                            sorters: function(attr) {
+                                if(attr == "month name") {
+                                    return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                                }
+                                if(attr == "day name") {
+                                    return sortAs(["Mon","Tue","Wed", "Thu","Fri","Sat","Sun"]);
+                                }
+                            },
+                            onRefresh: function (pivotUIOptions) {
+                                // this is correct way to apply fixed headers with pivotUI
+                                nrecoPivotExt.initFixedHeaders($('#pivotTable table.pvtTable'));
+
+                                // apply boostrap styles to pvt UI controls
+                                $('#pivotTable select.pvtAttrDropdown:not(.form-control)').addClass('form-control input-sm');
+                                $('#pivotTable select.pvtAggregator:not(.form-control), #pivotTable select.pvtRenderer:not(.form-control)').addClass('form-control input-sm');
+                                $('#pivotTable>table:not(.table)').addClass('table');
+
+                                pivotUIState = getPivotUIState(pivotUIOptions);
+                            }
+                        },pivotUIState),true);
+                }
+                else {
+
+                    $("#pivotTable").pivot(
+                        jsonData, $.extend({
+                            derivedAttributes: {
+                                "year":       dateFormat("sigDate", "%y", true),
+                                "month":      dateFormat("sigDate", "%m", true),
+                                "day":        dateFormat("sigDate", "%d", true),
+                                "month name": dateFormat("sigDate", "%n", true),
+                                "day name":   dateFormat("sigDate", "%w", true)
+                            },
+                            sorters: function(attr) {
+                                if(attr == "month name") {
+                                    return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                                }
+                                if(attr == "day name") {
+                                    return sortAs(["Mon","Tue","Wed", "Thu","Fri","Sat","Sun"]);
+                                }
+                            },
+                            filter: function(record) {
+                                return true;
+                            }
+                        },getPivotState(pivotUIState)));
+                }
+            }
+
+            function reloadData() {
+                var el = $("#result");
+                blockUI(el);
+                var response = $.ajax({
+                    "url" : '/api/group',
+                    "type" : "POST",
+                    "contentType" : 'application/json',
+                    "data": JSON.stringify({
+                        fromDate: getStartDate(),
+                        toDate: getEndDate(),
+                        customer: $('#customer').select2('val') || [],
+                        vendor: $('#vendor').select2('val') || [],
+                        ingressCountryId: $('#icountry').select2('val') || [],
+                        ingressOperatorId: $('#ioperator').select2('val') || [],
+                        egressCountryId: $('#ecountry').select2('val') || [],
+                        egressOperatorId: $('#eoperator').select2('val') || [],
+                        hourly: $('#groupType').is(':checked'),
+                        compareDates: $('#compareDates').is(':checked')
+                    })
+                });
+
+                response.done(function(json) {
+                    jsonData = json;
+                    reloadPivot();
+                    unblockUI(el);
+                });
+
+                response.always(function(){
+                  //  $('#widgetPivot').trigger('reloaded.ace.widget');
+                });
+
+                response.fail(function(error){
+
+                });
+
+                return response;
+            }
+
+            $('#search').on('click', function(event) {
+                event.preventDefault();
+                reloadData();
+            });
+
+            function getStartDate() {
+                var date = $('#daterange').data('daterangepicker').startDate;
+                return date.format('YYYY-MM-DDTHH:00:00');
+            }
+
+            function getEndDate() {
+                var date = $('#daterange').data('daterangepicker').endDate;
+                return date.format('YYYY-MM-DDTHH:00:00');
+            }
+
+            $("#uiEdit").click(function(){
+                if($(this).hasClass("uiEdit")){
+                    $(this).removeClass("uiEdit");
+                    reloadPivot();
+                }
+                else{
+                    $(this).addClass("uiEdit");
+                    reloadPivot();
+                }
+            });
+
+            var getReportData = function () {
+                return  {
+                    fromDate: moment().diff(getStartDate(),'days'),
+                    toDate: moment().diff(getEndDate(),'days'),
+                    hourDiff: moment().diff($('#daterange').data('daterangepicker').startDate,'hours') + 1,
+                    customer : $('#customer').select2('data'),
+                    vendor : $('#vendor').select2('data'),
+                    ingressCountryId : $('#icountry').select2('data'),
+                    ingressOperatorId : $('#ioperator').select2('data'),
+                    egressCountryId : $('#ecountry').select2('data'),
+                    egressOperatorId : $('#eoperator').select2('data'),
+                    pivotTemplate : pivotUIState,
+                    hourly: $("#groupType").prop(':checked'),
+                    uiEdit: $("#uiEdit").hasClass("uiEdit")
+                };
+            }
+
+            $('#saveReport').click(function () {
+                var response = $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: '/api/pivotTemplates',
+                    data: JSON.stringify({
+                        templateName: $('#reportName').val(),
+                        templateData: JSON.stringify(getReportData())
+                    })
+                });
+
+                response.done(function(result) {
+                    $.notify('Report has been save/updated successfully', 'success');
+                });
+            });
+
+            $(document).on("click", '.widget .reload', function (event) {
+                event.preventDefault();
+                reloadData();
+            });
+
+            $('#pivotTemplate').select2({
+                placeholder: 'Select Report',
+                allowClear: true
+            });
+            // To show empty report
+            $('#pivotTemplate').val(null).trigger('change');
+
+            $('#pivotTemplate').on('select2:select', function (e) {
+                var data = JSON.parse(e.params.data.id);
+                //pivotUIState = JSON.parse(e.added.pivotTemplate);
+
+                //document.title = e.added.text;
+                //history.pushState('', e.added.text, "?template=" + e.added.text);
+
+                if( data.hourDiff < 5 ) {
+                    $('#daterange').data('daterangepicker').setStartDate(moment().subtract(data.fromDate,'days').subtract(data.hourDiff,'hours'));
+                    $('#daterange').data('daterangepicker').setEndDate(moment().endOf('day').subtract(data.toDate,'days'));
+                } else {
+                    $('#daterange').data('daterangepicker').setStartDate(moment().startOf('day').subtract(data.fromDate,'days'));
+                    $('#daterange').data('daterangepicker').setEndDate(moment().endOf('day').subtract(data.toDate,'days'));
+                }
+
+
+                updateSelect2($('#customer'),data.customer);
+                updateSelect2($('#vendor'),data.vendor);
+                updateSelect2($('#icountry'), data.ingressCountryId);
+                updateSelect2($('#ioperator'), data.ingressOperatorId);
+                updateSelect2($('#ecountry'), data.egressCountryId);
+                updateSelect2($('#eoperator'), data.egressOperatorId);
+
+                pivotUIState = data.pivotTemplate;
+                if(data.hourly)
+                    groupType.turnOn();
+                else
+                    groupType.turnOff();
+
+                if(data.uiEdit)
+                    $("#uiEdit").addClass("uiEdit");
+                else
+                    $("#uiEdit").removeClass("uiEdit");
+
+                reloadData();
+            });
+
+            var groupType;
+            $(".ios-switch").each(function(){
+                 groupType = new Switch(this);
+            });
+
+            var updateSelect2 = function (el, data) {
+                el.val(null);
+                jQuery.each(data,function (index, value) {
+                    var option = new Option(value.text,value.id,true,true);
+                    el.append(option);
+                });
+                el.trigger('change');
+            }
+
+
+        });
+        // ]]>
+    </script>
+</div>
+</body>
+</html>

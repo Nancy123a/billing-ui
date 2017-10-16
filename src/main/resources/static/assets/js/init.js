@@ -199,14 +199,14 @@ $(document).on("click", ".widget", function(){
     }
 });
 
-$(document).on("click", '.widget .reload', function (event) { 
-  event.preventDefault();
-  var el = $(this).parents(".widget:first");
-  blockUI(el);
-    window.setTimeout(function () {
-       unblockUI(el);
-    }, 1000);
-});
+// $(document).on("click", '.widget .reload', function (event) {
+//   event.preventDefault();
+//   var el = $(this).parents(".widget:first");
+//   blockUI(el);
+//     window.setTimeout(function () {
+//        unblockUI(el);
+//     }, 1000);
+// });
 
 $(document).on("click", ".widget-header .widget-maximize", function(event){
     event.preventDefault();
@@ -254,9 +254,9 @@ $('input:not(.ios-switch)').iCheck({
 });
 
 // IOS7 SWITCH
-$(".ios-switch").each(function(){
-    mySwitch = new Switch(this);
-});
+// $(".ios-switch").each(function(){
+//     mySwitch = new Switch(this);
+// });
 
 //GALLERY
 $('.gallery-wrap').each(function() { // the containers for all your galleries
