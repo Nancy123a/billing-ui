@@ -6,9 +6,8 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
 <head>
     <title>Country</title>
-    <link th:href="@{/assets/libs/jquery-datatables/css/dataTables.bootstrap.css}" rel="stylesheet" type="text/css"/>
-    <link th:href="@{/assets/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css}"
-          rel="stylesheet" type="text/css"/>
+   <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.dataTables.min.css}" rel="stylesheet" type="text/css" />
 
 </head>
 <body>
@@ -210,9 +209,15 @@
 
 
 <div layout:fragment="script">
-    <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
-    <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.js}"></script>
-    <script th:src="@{/assets/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js}"></script>
+
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jquery-1.12.4.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/dataTables.buttons.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.print.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jszip.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/pdfmake.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/vfs_fonts.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.html5.min.js}"></script>
     <script>
 
         // <![CDATA[
@@ -226,14 +231,30 @@
                     '<a title="Delete" class="delete btn btn-darkblue-1" data-toggle="modal" data-target="#myModalDelete"><i class="fa fa-times"></i></a>' +
                     '</div>'
             }
+            $('#operatorDTCountry').on('init.dt', function() {
+                $('.data-add')
+                    .attr('data-toggle', 'modal')
+                    .attr('data-target', '#myModalAdd');
+            });
 
             table = $('#operatorDTCountry').DataTable({
-                dom: 'T<"clear">lfrtip',
-
-
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                        text: 'Add Country',
+                        action: function ( ) {
+                       },
+                        className: 'data-add'
+                    },
+                    'copyHtml5',
+                    'csvHtml5',
+                    'excelHtml5',
+                    'pdfHtml5',
+                    'print'
+                ],
+                "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
                 serverSide: true,
                 paging: true,
-                "lengthMenu": [5, 10, 25, 50, 75, 100],
                 "search": {
                     "regex": true
                 },
@@ -287,20 +308,7 @@
                     });
                 },
             });
-            $.fn.dataTable.ext.buttons.reload = {
-                text: 'Reload',
-                action: function (e, dt, node, config) {
-                    alert("clicked");
-                }
-            };
-            new $.fn.dataTable.Buttons(table, {
-                buttons: [
-                    'reload', 'copy', 'csv', 'excel', 'pdf', 'print'
-                ]
-            });
 
-            table.buttons().container()
-                .appendTo($('.col-sm-6:eq(0)', table.table().container()));
         });
 
 
@@ -323,7 +331,7 @@
                     success: function (result) {
 
                         table.ajax.reload();
-                        $("#myModalAdd").modal('hide');
+                        $("#myModalAdd .close").click();
                         $("#AddcountryForm")[0].reset();
 
                     },
@@ -367,7 +375,7 @@
                     success: function (result) {
 
                         table.ajax.reload();
-                        $("#myModal").modal('hide');
+                        $("#myModal .close").click();
                         $("#EditcountryForm")[0].reset();
 
                     },
@@ -399,15 +407,14 @@
                 data: JSON.stringify(formData),
                 dataType: 'json',
                 success: function (result) {
+                    $('#myModalDelete .close').click();
                     table.ajax.reload();
-                    $('#myModalDelete').modal('hide');
-
                 },
                 error: function (e) {
+                    $('#myModalDelete .close').click();
                     $('#errorMessageDivDelete').css("display", "block");
-                    $('#myModalDelete').modal('hide');
 
-                }
+                 }
             });
 
         });
