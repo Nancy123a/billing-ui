@@ -43,4 +43,9 @@ public class DefaultController {
         return new ModelAndView("member/admin/operator");
     }
 
+    @GetMapping("/admin/countrycode")
+    public ModelAndView countrycode() {
+        return new ModelAndView("member/admin/countrycode");
+    }
+
 }
