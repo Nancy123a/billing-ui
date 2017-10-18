@@ -6,8 +6,9 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
 <head>
     <title>Operator</title>
-    <link th:href="@{/assets/libs/jquery-datatables/css/dataTables.bootstrap.css}" rel="stylesheet" type="text/css" />
-    <link th:href="@{/assets/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.dataTables.min.css}" rel="stylesheet" type="text/css" />
+
 </head>
 <body>
 <div layout:fragment="content">
@@ -26,6 +27,116 @@
                         <a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
                     </div>
                 </div>
+                <div id="errorMessageDivDelete" class="alert alert-danger" style="display:none;">
+                    <button id="btnCloseErrorDiv" type="button" class="close">
+                        <i class="ace-icon fa fa-times"></i>
+                    </button>
+                    <label id="errorMessageDelete">Error You cant Delete this row</label>
+                </div>
+                <div id="myModalDelete" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deletelabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title" id="deletelabel">Delete Country</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete this country?</p>
+                            </div>
+
+                            <div class="modal-footer">
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <div class="row">
+
+                                            <div class="col-md-2"></div>
+                                            <div class="col-md-2">
+                                                <button type="button" data-dismiss="modal" class="btn btn-darkblue-1"
+                                                        id="cancelDelete">Cancel
+                                                </button>
+                                            </div>
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-3">
+                                                <button type="button" class="btn btn-darkblue-1" id="okDelete">OK
+                                                </button>
+                                            </div>
+
+                                            <div class="col-md-2"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
+                <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Edit Operator</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div id="errorMessageDivEdit" class="alert alert-danger" style="display: none;">
+                                    <button id="btnCloseErrorDivEdit" type="button" class="close">
+                                        <i class="ace-icon fa fa-times"></i>
+                                    </button>
+                                    <label id="errorMessageEdit">Please Enter Operator Name</label>
+                                </div>
+
+                                <form role="form" id="EditoperatorForm">
+
+                                    <div class="form-group">
+                                        <input type="hidden" class="form-control" placeholder="Operator ID"
+                                               id="EditoperatorId"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Operator Name"
+                                               id="Editoperatorname"/>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <input type="date" class="form-control" placeholder="Activation Date" id="activate"/>
+
+                                    </div>
+                                    <div class="form-group" >
+                                        <input type="date" class="form-control" placeholder="Deactivation Date" id="deactivate" />
+
+                                    </div>
+
+                                </form>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <div class="row">
+
+                                            <div class="col-md-3"></div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-darkblue-1" id="buttonEdit">Edit
+                                                    Operator
+                                                </button>
+                                            </div>
+                                            <div class="col-md-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
                 <div class="widget-content">
                     <br />
                     <div class="table-responsive">
@@ -33,23 +144,24 @@
                             <table id="operatorDT" class="table table-striped table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>Name</th>
-                                    <th>Country</th>
+                                    <th>Operator Id</th>
+                                    <th>Operator Name</th>
+                                    <th>CountryName </th>
                                     <th>Activation Date</th>
                                     <th>Deactivation Date</th>
-                                    <th></th>
+                                    <th>Options</th>
                                 </tr>
                                 </thead>
 
                                 <tfoot>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>Name</th>
-                                    <th>Country</th>
+                                    <th>Operator Id</th>
+                                    <th>Operaor Name</th>
+                                    <th>Country Name</th>
                                     <th>Activation Date</th>
                                     <th>Deactivation Date</th>
-                                    <th></th>
+                                    <th>Options</th>
+
                                 </tr>
                                 </tfoot>
 
@@ -60,71 +172,46 @@
             </div>
         </div>
     </div>
-    <form class="form-horizontal" style="display: none;" id="input-form">
 
-        <div id="errorMessageDiv" class="alert alert-danger" style="display: none;">
-            <button id="btnCloseErrorDiv" type="button" class="close">
-                <i class="ace-icon fa fa-times"></i>
-            </button>
-            <label id="errorMessage"></label>
-        </div>
-
-        <div class="form-group">
-            <label class="col-xs-3 control-label" for="operatorName">Operator
-                Name</label>
-
-            <div class="col-xs-7">
-                <input type="text"
-                       name="operatorName" id="operatorName" class="form-control"
-                       value=""/>
-            </div>
-        </div>
-        <div class="form-group" style="display: none;">
-            <label class="col-xs-3 control-label" for="operatorId">Operator
-                ID</label>
-
-            <div class="col-xs-7">
-                <div class="clearfix">
-                    <input type="text" name="operatorId"
-                           id="operatorId" class="form-control" value=""/>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-xs-7 col-xs-offset-3">
-                <button type="submit" class="btn btn-primary" id="btnSubmit"
-                        name="save">Submit
-                </button>
-                <button type="button" class="btn btn-default" id="btnCancel"
-                        name="cancel">Cancel
-                </button>
-            </div>
-        </div>
-    </form>
 </div>
 <div layout:fragment="script">
-    <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
-    <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.js}"></script>
-    <script th:src="@{/assets/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js}"></script>
-    <script th:src="@{/assets/libs/bootbox/bootbox.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jquery-1.12.4.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/dataTables.buttons.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.print.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jszip.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/pdfmake.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/vfs_fonts.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.html5.min.js}"></script>
+
     <script>
         // <![CDATA[
-        $(function() {
             function actionButtons() {
-                return '<div class="btn-group btn-group-xs">\n' +
-                    '<a title="Edit" class="edit btn btn-default"><i class="fa fa-edit"></i></a>' +
-                    '<a title="Delete" class="delete btn btn-default"><i class="fa fa-times"></i></a>' +
-                    '</div>';
+
+
+                return '<div class="btn-group">\n' +
+                    '<a title="Edit" class="edit btn btn-darkblue-1" data-toggle="modal" data-target="#myModal"><i class="fa fa-edit"></i></a>' +
+                    '<a title="Delete" class="delete btn btn-darkblue-1" data-toggle="modal" data-target="#myModalDelete"><i class="fa fa-times"></i></a>' +
+                    '</div>'
             }
 
             var recordsTotal = 0;
-
-            var operatorDT = $('#operatorDT').DataTable({
-                dom: 'T<"clear">lfrtip',
-                tableTools: {
-                    "sSwfPath": "/assets/libs/jquery-datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
-                },
+            var table,datas;
+           table = $('#operatorDT').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        text: 'Add Operator',
+                        action: function ( ) {
+                        },
+                        className: 'data-add'
+                    },
+                    'copyHtml5',
+                    'csvHtml5',
+                    'excelHtml5',
+                    'pdfHtml5',
+                    'print'
+                ],
                 serverSide: true,
                 paging: true,
                 "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
@@ -140,7 +227,7 @@
                     { "data": null,
                         "defaultContent": actionButtons()}
                 ],
-                "ajax": function(data, callback, settings){
+                "ajax": function(data, callback,settings){
                     var url = "/api/operators?projection=dataTable";
 
                     if(data.search != null && data.search.value != "") {
@@ -181,30 +268,93 @@
                 },
             });
 
-            $('#operatorDT').on('click', 'a.edit', function (e) {
-                var data = operatorDT.row($(this).parents('tr')).data();
-                boxEdit = bootbox.dialog({
-                    title: 'Edit Operator',
-                    message: $('#input-form'),
-                    show: false,
-                }).on('shown.bs.modal', function (e) {
-                    if (e.target == this) {
-                        $('#errorMessageDelDiv').hide();
-                        $('#successMessageDiv').hide();
-                        $('#errorMessageDiv').hide();
-                        $('#operatorId').val(data.operatorId).attr('readonly', true);
-                        $('#operatorName').val(data.operatorName);
-                    }
-                }).on('hide.bs.modal', function (e) {
+        $('#operatorDT').on('click', 'a.edit', function (e) {
 
-                    if (e.target == this) {
-                        $('#input-form').hide().appendTo('body');
+            var data = table.row($(this).parents('tr')).data();
+
+           $('#EditoperatorId').val(data.operatorId).attr('readonly', true);
+           $('#Editoperatorname').val(data.operatorName);
+           $('#activate').val(data.activationDate);
+           $('#deactivate').val(data.deactivationDate);
+  });
+
+        $("#buttonEdit").click(function () {
+
+            var operatorId = $('#EditoperatorId').val();
+            var operatorName = $('#Editoperatorname').val();
+            var activate = $('#activate').val();
+            var deactivate = $('#deactivate').val();
+            var splitact=activate.split('-');
+            var splitdeact=deactivate.split('-');
+            var correctact=splitact[1]+"-"+splitact[2]+"-"+splitact[0];
+            var correctdeac=splitdeact[1]+"-"+splitdeact[2]+"-"+splitdeact[0];
+
+          if (operatorName != null && operatorName != "") {
+
+                var formData = {operatorName: operatorName,obsolete:1,activationDate:correctact,deactivationDate:correctdeac,typeId:1};
+
+                var url = "/api/operators/" + operatorId;
+
+
+                $.ajax({
+                    type: "PUT",
+                    contentType: "application/json",
+                    url: url,
+                    data: JSON.stringify(formData),
+                    dataType: 'json',
+                    success: function (result) {
+
+                        table.ajax.reload();
+                        $("#myModal .close").click();
+                        $("#EditoperatorForm")[0].reset();
+
+                    },
+                    error: function (e) {
+                        alert("Error " + e);
                     }
                 });
-                boxEdit.modal('show');
-                return false;
-            });
+            }
+            else {
+                $('#errorMessageDivEdit').css("display", "block");
+            }
         });
+
+        $('#operatorDT').on('click', 'a.delete', function (e) {
+
+            datas = table.row($(this).parents('tr')).data();
+        });
+
+        $("#okDelete").click(function () {
+
+            var url = "/api/operators/" + datas.operatorId;
+            var formData = {};
+
+            $.ajax({
+                type: "DELETE",
+                contentType: "application/json",
+                url: url,
+                data: JSON.stringify(formData),
+                dataType: 'json',
+                success: function (result) {
+                    $('#myModalDelete .close').click();
+                    table.ajax.reload();
+                },
+                error: function (e) {
+                    $('#myModalDelete .close').click();
+                    $('#errorMessageDivDelete').css("display", "block");
+
+                }
+            });
+
+        });
+
+        $('#btnCloseErrorDiv').click(function () {
+            $('#errorMessageDivDelete').css("display", "none");
+        });
+        $('#btnCloseErrorDivEdit').click(function () {
+            $('#errorMessageDivEdit').css("display", "none");
+        });
+
         // ]]>
     </script>
 </div>
