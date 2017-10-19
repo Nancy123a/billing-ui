@@ -48,4 +48,8 @@ public class DefaultController {
         return new ModelAndView("member/admin/countrycode");
     }
 
+    @GetMapping("/admin/operatorcode")
+    public ModelAndView operatorcode() {
+        return new ModelAndView("member/admin/operatorcode");
+    }
 }
