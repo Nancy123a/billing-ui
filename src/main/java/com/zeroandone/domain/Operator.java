@@ -22,6 +22,7 @@ public class Operator {
     @JoinColumn(name="countryId")
     private Country country;
 
+
     private int obsolete;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
