@@ -46,7 +46,6 @@ $(document).ready(function(){
 	FastClick.attach(document.body);
 	resizefunc.push("initscrolls");
 	resizefunc.push("changeptype");
-	$('.sparkline').sparkline('html', { enableTagOptions: true });
 
 	$('.animate-number').each(function(){
 		$(this).animateNumbers($(this).attr("data-value"), true, parseInt($(this).attr("data-duration"))); 
