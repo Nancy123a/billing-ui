@@ -1,5 +1,17 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
+create table users(username VARCHAR(50) not null primary key,password varchar(50) not null, enabled boolean not null);
+
+create table authorities (username varchar(50) not null,authority varchar(50) not null);
+
+create table persistent_logins (username varchar(64) not null,series varchar(64) primary key,token varchar(64) not null,last_used timestamp not null);
+
+INSERT INTO USERS (username,password,enabled) VALUES ('user','password','true');
+
+INSERT INTO AUTHORITIES (USERNAME,AUTHORITY) VALUES ('user','ROLE_USER');
+INSERT INTO AUTHORITIES (USERNAME,AUTHORITY) VALUES ('user','ROLE_ADMIN');
+
+
 INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier1','Carrier1');
 INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier2','Carrier2');
 INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier3','Carrier3');
