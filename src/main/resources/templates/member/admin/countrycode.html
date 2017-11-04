@@ -6,8 +6,8 @@
       xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <title>Country Code</title>
-    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
-    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.dataTables.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/css/dataTables.bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.bootstrap.min.css}" rel="stylesheet" type="text/css" />
     <link th:href="@{/assets/libs/bootstrap-select2/css/select2.min.css}" rel="stylesheet" type="text/css" />
     <link th:href="@{/assets/libs/bootstrap-select2/css/select2-bootstrap.min.css}" rel="stylesheet" type="text/css" />
 </head>
@@ -19,223 +19,208 @@
     </div>
     <!-- Page Heading End-->
     <div class="row">
+        <div id="errorMessageDivDelete" class="alert alert-danger" style="display:none;">
+            <button id="btnCloseErrorDiv" type="button" class="close">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <label id="errorMessageDelete">Error You cant Delete this row</label>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-12 portlets">
             <div class="widget">
                 <div class="widget-header">
+                    <h2>Country Code Table</h2>
                     <div class="additional-btn">
-                        <a href="#" class="hidden reload"><i class="icon-ccw-1"></i></a>
-                        <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
-                        <a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+                        <a href="#" class=""><i class="fa fa-search"></i> </a>
+                        <a href="#" class="widget-toggle"><i class="fa fa-chevron-down"></i></a>
                     </div>
                 </div>
-                <div id="errorMessageDivDelete" class="alert alert-danger" style="display: none;">
-                    <button id="btnCloseErrorDiv" type="button" class="close">
-                        <i class="ace-icon fa fa-times">You cann't Delete this row!</i>
-                    </button>
-                    <label id="errorMessageDelete"></label>
-                </div>
-                <div id="myModalDeletecode" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deletelabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
-                                </button>
-                                <h4 class="modal-title" id="deletelabel">Delete Country</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to delete this country code?</p>
-                            </div>
-
-                            <div class="modal-footer">
-                                <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4">
-                                        <div class="row">
-
-                                            <div class="col-md-2"></div>
-                                            <div class="col-md-2">
-                                                <button type="button" data-dismiss="modal" class="btn btn-darkblue-1"
-                                                        id="cancelDelete">Cancel
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3"></div>
-                                            <div class="col-md-3">
-                                                <button type="button" class="btn btn-darkblue-1" id="okDelete">OK
-                                                </button>
-                                            </div>
-
-                                            <div class="col-md-2"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div><!-- /.modal-content -->
-                    </div><!-- /.modal-dialog -->
-                </div><!-- /.modal -->
-
-                <div id="myModalcode" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
-                                </button>
-                                <h4 class="modal-title" id="myModalLabel">Edit Country Code</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div id="errorMessageDivEdit" class="alert alert-danger" style="display: none;">
-                                    <button id="btnCloseErrorDivEdit" type="button" class="close">
-                                        <i class="ace-icon fa fa-times"></i>
-                                    </button>
-                                    <label id="errorMessageEdit">Please Enter Country code</label>
-                                </div>
-                                <form role="form" id="EditcountrycodeForm">
-                                    <div class="form-group">
-                                        <input type="hidden" class="form-control" id="EditcountryId"/>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="hidden" class="form-control" id="EditcountrycodeId"/>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Country Name:</label>
-                                        <input type="text" class="form-control" placeholder="Country Name"
-                                               id="Editcode"/>
-                                    </div>
-                                </form>
-                                <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4">
-                                        <div class="row">
-
-                                            <div class="col-md-3"></div>
-                                            <div class="col-md-4">
-                                                <button type="submit" class="btn btn-darkblue-1" id="buttonEditcode">
-                                                    Edit
-                                                    Country Code
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                        </div><!-- /.modal-content -->
-                    </div><!-- /.modal-dialog -->
-                </div><!-- /.modal -->
-
-
-                <div id="myModalAddcode" class="modal fade"  role="dialog" aria-labelledby="label"
-                     aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
-                                </button>
-                                <h4 class="modal-title" id="label">Add Country</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
-                                    <button id="btnCloseErrorDivAdd" type="button" class="close">
-                                        <i class="ace-icon fa fa-times"></i>
-                                    </button>
-                                    <label id="errorMessageAdd">Please Enter Country name</label>
-                                </div>
-                                <form role="form" id="AddcountryForm">
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-2"></div>
-                                            <div class="col-md-8">
-                                                <label>Country Name:</label>
-                                                <select class="form-control" id="countryselect" style="width:100%;"/>
-                                            <div class="col-md-2"></div>
-                                            </div></div>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-md-2"></div>
-                                            <div class="col-md-8">
-                                                <label>Country ID:</label>
-                                                <input type="text" class="form-control" id="countrycode"
-                                                       placeholder="Country Code"/>
-                                            </div>
-                                            <div class="col-md-2"></div>
-                                        </div>
-                                    </div>
-                                </form>
-                                <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4">
-                                        <div class="row">
-
-                                            <div class="col-md-3"></div>
-                                            <div class="col-md-4">
-                                                <button type="submit" class="btn btn-darkblue-1" id="buttoncode">Add
-                                                    Country Code
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                        </div><!-- /.modal-content -->
-                    </div><!-- /.modal-dialog -->
-                </div><!-- /.modal -->
-
 
                 <div class="widget-content">
-
- <div class="table-responsive">
-                        <form class='form-horizontal' role='form'>
-                            <table id="operatorDTCountrycode" class="table table-striped table-bordered" cellspacing="0"
-                                   width="100%">
-                                <thead>
-                                <tr>
-                                    <th>Country_Code_ID</th>
-                                    <th>Code</th>
-                                    <th>Country ID</th>
-                                    <th>Country Name</th>
-                                    <th>Options</th>
-                                </tr>
-                                </thead>
-
-                                <tfoot>
-                                <tr>
-                                    <th>Country_Code_ID</th>
-                                    <th>Code</th>
-                                    <th>Country ID</th>
-                                    <th>Country Name</th>
-                                    <th>Options</th>
-                                </tr>
-                                </tfoot>
-
-                            </table>
-                        </form>
+                    <br />
+                    <div class="table-responsive">
+                        <table id="countryCodeDT" class="table table-striped table-bordered" cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Code</th>
+                                <th>Country Name</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
-
-
                 </div>
             </div>
         </div>
     </div>
+
+    <div id="deleteCodeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deletelabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="deletelabel">Delete Country</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this country code?</p>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+
+                                <div class="col-md-2"></div>
+                                <div class="col-md-2">
+                                    <button type="button" data-dismiss="modal" class="btn btn-darkblue-1"
+                                            id="cancelDelete">Cancel
+                                    </button>
+                                </div>
+                                <div class="col-md-3"></div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-darkblue-1" id="okDelete">OK
+                                    </button>
+                                </div>
+
+                                <div class="col-md-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div id="editCodeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Country Code</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="errorMessageDivEdit" class="alert alert-danger" style="display: none;">
+                        <button id="btnCloseErrorDivEdit" type="button" class="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </button>
+                        <label id="errorMessageEdit">Please Enter Country code</label>
+                    </div>
+                    <form role="form" id="EditcountrycodeForm">
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" id="EditcountryId"/>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" id="EditcountrycodeId"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Country Code:</label>
+                            <input type="text" class="form-control" placeholder="Country Code"
+                                   id="Editcode"/>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+
+                                <div class="col-md-3"></div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-darkblue-1" id="buttonEditcode">
+                                        Edit
+                                        Country Code
+                                    </button>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div id="addCodeModal" class="modal fade"  role="dialog" aria-labelledby="label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="label">Add Country Code</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
+                        <button id="btnCloseErrorDivAdd" type="button" class="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </button>
+                        <label id="errorMessageAdd">Please fill missing data</label>
+                    </div>
+                    <form role="form" id="AddcountryForm">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-8">
+                                    <label>Country :</label>
+                                    <select class="form-control" id="countryselect" style="width:100%;"/>
+                                    <div class="col-md-2"></div>
+                                </div></div>
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-8">
+                                    <label>Country Code:</label>
+                                    <input type="text" class="form-control" id="countrycode"
+                                           placeholder="Country Code"/>
+                                </div>
+                                <div class="col-md-2"></div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+
+                                <div class="col-md-3"></div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-darkblue-1" id="addCode">Add
+                                    </button>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
 </div>
 
 
 <div layout:fragment="script">
-    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jquery-1.12.4.js}"></script>
-    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/dataTables.buttons.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.bootstrap.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.print.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jszip.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/pdfmake.min.js}"></script>
@@ -243,6 +228,7 @@
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.html5.min.js}"></script>
     <script th:src="@{/assets/libs/bootstrap-select2/js/select2.min.js}"></script>
     <script th:src="@{/assets/libs/bootstrap-select2/js/select2.extended-ajax.js}"></script>
+
     <script>
 
         // <![CDATA[
@@ -252,23 +238,28 @@
 
         $(function () {
             function actionEditButtons() {
-                return '<div class="btn-group">\n' +
-                    '<a title="Edit" class="edit btn btn-darkblue-1" data-toggle="modal" data-target="#myModalcode"><i class="fa fa-edit"></i></a>' +
-                    '<a title="Delete" class="delete btn btn-darkblue-1" data-toggle="modal" data-target="#myModalDeletecode"><i class="fa fa-times"></i></a>' +
+                return '<div class="pull-right btn-group">\n' +
+                    '<a title="Edit" class="edit btn btn-warning" data-toggle="modal" data-target="#editCodeModal"><i class="fa fa-edit"></i></a>' +
+                    '<a title="Delete" class="delete btn btn-danger" data-toggle="modal" data-target="#deleteCodeModal"><i class="fa fa-times"></i></a>' +
                     '</div>'
             }
-            $('#operatorDTCountrycode').on('init.dt', function() {
+            $('#countryCodeDT').on('init.dt', function() {
                 $('.data-add')
                     .attr('data-toggle', 'modal')
-                    .attr('data-target', '#myModalAddcode');
+                    .attr('data-target', '#addCodeModal');
             });
 
 
-            table = $('#operatorDTCountrycode').DataTable({
-                dom: 'Blfrtip',
+            table = $('#countryCodeDT').DataTable({
+                dom: '<"row"<"col-xs-4"l><"col-xs-3"f><"col-xs-5"<"pull-right"B>>>rt<"row"<"col-xs-6"i><"col-xs-6"p>>',
+                language: {
+                    "processing": "<h1><i class='fa fa-refresh fa-spin'></i> <strong>Loading</strong></h1>"
+                },
+                searchDelay: 700,
+                processing: true,
                 buttons: [
                     {
-                        text: 'Add Country',
+                        text: 'Add',
                         action: function ( ) {
                             fillCountrySelect();
                         },
@@ -280,16 +271,13 @@
                     'pdfHtml5',
                     'print'
                 ],
+                "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+                "pageLength": 5,
                 serverSide: true,
-                paging: false,
-
-                "search": {
-                    "regex": true
-                },
+                paging: true,
                 "columns": [
                     {"data": 'countryCodeId'},
                     {"data": 'code'},
-                    {"data": 'countryId'},
                     {"data": 'country.countryName'},
                     {
                         "data": null,
@@ -299,6 +287,9 @@
 
                 ],
                 "ajax": function (data, callback, settings) {
+
+                    var el = $("#mainWidget");
+                    blockUI(el);
 
                     var url = "/api/countryCodes?projection=dataTable";
 
@@ -319,25 +310,62 @@
                     response.done(function (json) {
                         var result = {};
                         result.data = json._embedded.countryCodes;
-
-
+                        if (json.page != null) {
+                            if (recordsTotal == 0) {
+                                recordsTotal = json.page.totalElements;
+                            }
+                            result.recordsTotal = recordsTotal;
+                            result.recordsFiltered = json.page.totalElements;
+                        }
                         callback(result);
                     });
 
                     response.fail(function (errorThrown) {
                         var errorMessage = (errorThrown.responseJSON) ? errorThrown.responseJSON.message : errorThrown.responseText;
-
                         $('#errorThrown').html(errorMessage);
                         $('#error').show();
                     });
                 },
             });
 
-
+            function fillCountrySelect(){
+                //Check if we already initialized select2
+                if (!$('#countryselect').hasClass("select2-hidden-accessible")) {
+                    $('#countryselect').select2({
+                        minimumInputLength: 1,
+                        language: {
+                            inputTooShort: function () {
+                                return "Enter Country Name";
+                            }
+                        },
+                        ajax : {
+                            url : "/api/countries",
+                            quietMillis : 500,
+                            data : function(params) {
+                                return {
+                                    countryName: params.term,
+                                    page: (params.page || 1) - 1,
+                                    projection: 'select2'
+                                }
+                            },
+                            processResults : function (data,page) {
+                                if (data._embedded)
+                                    return { results: data._embedded.countries };
+                                else
+                                    return {results: data};
+                            }
+                        },
+                        theme: 'bootstrap'
+                    });
+                } else {
+                    $('#countryselect').val(null);
+                    $('#countryselect').trigger('change');
+                }
+            }
         });
 
 
-        $('#operatorDTCountrycode').on('click', 'a.edit', function (e) {
+        $('#countryCodeDT').on('click', 'a.edit', function (e) {
             var data = table.row($(this).parents('tr')).data();
 
             $('#EditcountryId').val(data.countryId);
@@ -347,35 +375,6 @@
 
         });
 
-
-        function fillCountrySelect(){
-            $('#countryselect').select2({
-                minimumInputLength: 1,
-                language: {
-                    inputTooShort: function () {
-                        return "Enter Country Name";
-                    }
-                },
-                ajax : {
-                    url : "/api/countries",
-                    quietMillis : 500,
-                    data : function(params) {
-                        return {
-                            countryName: params.term,
-                            page: (params.page || 1) - 1,
-                            projection: 'select2'
-                        }
-                    },
-                    processResults : function (data,page) {
-                        if (data._embedded)
-                            return { results: data._embedded.countries };
-                        else
-                            return {results: data};
-                    }
-                },
-                theme: 'bootstrap'
-            });
-        }
         $("#buttonEditcode").click(function () {
 
             var countryId = $('#EditcountryId').val();
@@ -398,7 +397,7 @@
                     success: function (result) {
 
                         table.ajax.reload();
-                        $("#myModalcode .close").click();
+                        $("#editCodeModal .close").click();
                         $("#EditcountrycodeForm")[0].reset();
 
                     },
@@ -411,7 +410,7 @@
                 $('#errorMessageDivEdit').css("display", "block");
             }
         });
-        $('#operatorDTCountrycode').on('click', 'a.delete', function (e) {
+        $('#countryCodeDT').on('click', 'a.delete', function (e) {
 
             datas = table.row($(this).parents('tr')).data();
         });
@@ -429,12 +428,12 @@
                 dataType: 'json',
                 success: function (result) {
                     table.ajax.reload();
-                    $('#myModalDeletecode .close').click();
+                    $('#deleteCodeModal .close').click();
 
                 },
                 error: function (e) {
                     $('#errorMessageDivDelete').css("display", "block");
-                    $('#myModalDeletecode .close').click();
+                    $('#deleteCodeModal .close').click();
 
                 }
             });
@@ -452,15 +451,12 @@
         });
 
 
-        $("#buttoncode").click(function () {
+        $("#addCode").click(function () {
             var countrycode = $('#countrycode').val();
-            var valueSelected=$("#countryselect").select2('val');
+            var valueSelected = $("#countryselect").select2('val');
             if (countrycode != null && countrycode != "" && valueSelected != "") {
                 var formData = {code: countrycode, countryId: valueSelected};
-
-
                 var url = "/api/countryCodes";
-
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
@@ -468,14 +464,11 @@
                     data: JSON.stringify(formData),
                     dataType: 'json',
                     success: function (result) {
-
                         table.ajax.reload();
-                        $("#myModalAddcode .close").click();
-                        $("#AddcountrycodeForm")[0].reset();
-
+                        $("#addCodeModal .close").click();
                     },
                     error: function (e) {
-                        alert("Error " + e);
+                        $('#errorMessageDivAdd').css("display", "block");
                     }
                 });
             }
