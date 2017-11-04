@@ -145,6 +145,20 @@
 //            else
                 $(".sidebar-menu li a[href*='"+curpage+"']").addClass("active");
         }
+
+        $.ajaxSetup({
+            statusCode: {
+                401: ajaxSessionTimeout,
+                403: ajaxSessionTimeout
+            }
+        });
+
+        function ajaxSessionTimeout()
+        {
+            // Handle Ajax session timeout here
+            console.log('session has expired');
+            location.reload();
+        }
         // ]]>
 	</script>
 	<!-- Page specific JavaScript -->

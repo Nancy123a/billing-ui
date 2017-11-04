@@ -60,9 +60,13 @@ public class QueryDslJpaEnhancedRepositoryImpl<T, ID extends Serializable> exten
     }
 
     @Override
-    public <PROJ> List<PROJ> customFindWithProjection(FactoryExpression<PROJ> factoryExpression, Predicate predicate, List<Expression<?>> groupBy) {
+    public <PROJ> List<PROJ> customFindWithProjection(FactoryExpression<PROJ> factoryExpression, Predicate predicate, List<Expression<?>> groupBy,Predicate havingCondition) {
         JPQLQuery query = createQuery(predicate);
         groupBy.forEach(p -> query.groupBy(p));
+        if(havingCondition != null) {
+            query.having(havingCondition);
+        }
         return query.select(factoryExpression).fetch();
     }
+
 }
