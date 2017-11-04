@@ -76,13 +76,19 @@
                             <label for="ioperator">Ingress Operator</label>
                             <select class="form-control" id="ioperator" />
                         </div>
-                        <div class="col-lg-1">
-                            <label for="groupType">Hourly</label>
-                            <input type="checkbox" id="groupType" class="ios-switch ios-switch-success" />
-                        </div>
-                        <div class="col-lg-2">
-                            <label for="search">.</label>
-                            <button class="form-control btn btn-info" id="search" type="button">Search</button>
+                        <div class="col-lg-3">
+                            <div class="col-xs-3">
+                                <label for="groupType">Hourly</label>
+                                <input type="checkbox" id="groupType" class="ios-switch ios-switch-success" />
+                            </div>
+                            <div class="col-xs-3">
+                                <label for="connected">Connected</label>
+                                <input type="checkbox" id="connected" class="ios-switch ios-switch-success" />
+                            </div>
+                            <div class="col-xs-6">
+                                <label for="search">.</label>
+                                <button class="form-control btn btn-info" id="search" type="button">Search</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -208,6 +214,7 @@
                                 egressCountryId: $('#ecountry').select2('val') || [],
                                 egressOperatorId: $('#eoperator').select2('val') || [],
                                 hourly: $('#groupType').is(':checked'),
+                                connected: $('#connected').is(':checked'),
                                 compareDates: $('#compareDates').is(':checked')
                             }),
                             statusCode: {
@@ -436,10 +443,8 @@
                 }
             });
 
-            var groupType;
-            $(".ios-switch").each(function(){
-                groupType = new Switch(this);
-            });
+            var groupType = new Switch($("#groupType")[0]);
+            var connected = new Switch($("#connected")[0]);
 
         });
         // ]]>

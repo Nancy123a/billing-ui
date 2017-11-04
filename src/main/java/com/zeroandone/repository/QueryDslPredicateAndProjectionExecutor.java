@@ -21,5 +21,5 @@ public interface QueryDslPredicateAndProjectionExecutor<T, ID extends Serializab
 
     <PROJ> Page<PROJ> customFindWithProjection(FactoryExpression<PROJ> factoryExpression, Predicate predicate, Pageable pageable);
 
-    <PROJ> List<PROJ> customFindWithProjection(FactoryExpression<PROJ> factoryExpression, Predicate predicate, List<Expression<?>> groupBy);
+    <PROJ> List<PROJ> customFindWithProjection(FactoryExpression<PROJ> factoryExpression, Predicate predicate, List<Expression<?>> groupBy,Predicate havingCondition);
 }

@@ -30,11 +30,11 @@ public class CDRController {
             return cdrStatisticDailyRepository.customFindWithProjection(
                     Projections.bean(CDRStatistic.class,cdrGroupCriteria.getSelect()),
                     cdrGroupCriteria.getWhere().getValue(),
-                    cdrGroupCriteria.getGroupBy());
+                    cdrGroupCriteria.getGroupBy(),cdrGroupCriteria.getHavingCondition());
         else
             return cdrStatisticHourlyRepository.customFindWithProjection(
                     Projections.bean(CDRStatistic.class,cdrGroupCriteria.getSelect()),
                     cdrGroupCriteria.getWhere().getValue(),
-                    cdrGroupCriteria.getGroupBy());
+                    cdrGroupCriteria.getGroupBy(),cdrGroupCriteria.getHavingCondition());
     }
 }

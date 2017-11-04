@@ -33,6 +33,7 @@ public class CDRStatisticCriteria {
 
 	private boolean cache = false;
 	private boolean hourly = false;
+	private boolean connected = false;
 	private boolean compareDates = false;
 
 	public Map getSelect(){
@@ -147,6 +148,27 @@ public class CDRStatisticCriteria {
         }
 
         return where;
+    }
+
+    public BooleanBuilder getHavingCondition() {
+
+        if(connected) {
+            BooleanBuilder having = new BooleanBuilder();
+
+            QCdrStatisticBase qCdrStatisticBase;
+
+            if(isHourly())
+                qCdrStatisticBase = QCdrStatisticHourly.cdrStatisticHourly._super;
+            else
+                qCdrStatisticBase = QCdrStatisticDaily.cdrStatisticDaily._super;
+
+            having.and(qCdrStatisticBase.connected.sum().gt(0));
+
+            return having;
+        }
+
+        return null;
+
     }
 
     public List<Expression<?>> getGroupBy(){
