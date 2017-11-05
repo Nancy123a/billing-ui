@@ -119,7 +119,6 @@
                 wrappedRenderers[rName] = nrecoPivotExt.wrapTableRenderer(wrappedRenderers[rName]);
             });
 
-
             var getAggregator = function (aggregatorName,vals) {
                 return $.pivotUtilities.aggregators[aggregatorName](vals);
             };
@@ -130,6 +129,17 @@
                 if($.inArray(rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
                     return $.pivotUtilities.c3_renderers[rendererName];
             };
+
+
+            var chartAreaSize = {};
+
+            // calculate chart size to avoid horizontal scroll
+            var refreshChartAreaSize = function () {
+                chartAreaSize.width = $('#weekly-statistics').width()-50;
+                chartAreaSize.height = $('#weekly-statistics').width() / 2;
+            };
+
+            refreshChartAreaSize();
 
 
             var dailyReport = loadReport('Weekly Traffic');
@@ -196,6 +206,9 @@
             function reloadPivot(pivotDiv,jsonData,pivotData) {
                 pivotDiv.pivot(
                     jsonData, $.extend({
+                        rendererOptions : {
+                            c3: { size: chartAreaSize }
+                        },
                         wrapWith: '<div class="pvtTableRendererHolder">>/div>',
                         derivedAttributes: {
                             "year":       dateFormat("sigDate", "%y", true),
@@ -253,6 +266,7 @@
                 });
                 return attribute;
             }
+
         });
         // ]]>
     </script>
