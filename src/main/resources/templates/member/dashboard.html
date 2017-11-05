@@ -6,18 +6,256 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
 <head>
     <title>Dashboard</title>
+    <link th:href="@{/assets/libs/pivottable/pivot.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/pivottable/nrecopivottableext.css}" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css" rel="stylesheet" />
+    <style>
+        /* styles for responsive pivot UI + bootstrap-like styles */
+        .pvtTableRendererHolder {
+            max-height:600px;  /* limit table height if needed */
+            max-width: 600px;
+        }
+
+        .pivotHolder p{
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <div layout:fragment="content">
     <!-- Page Heading Start -->
     <div class="page-heading">
-        <h1><i class='fa fa-file'></i> Blank</h1>
-        <h3>Blank Page</h3>
+        <h1><i class='fa fa-line-chart'></i> Dashboard</h1>
+        <h3>Reports</h3>
     </div>
     <!-- Page Heading End-->
     <div class="row">
-        <div class="col-md-12 portlets"></div>
+        <div class="col-lg-8 portlets">
+            <div id="weekly-statistics" class="widget">
+                <div class="widget-header transparent">
+                    <h2><i class="icon-chart-line"></i> <strong>Daily</strong> Statistics</h2>
+                    <div class="additional-btn">
+                        <a href="#" class="hidden reload"><i class="fa fa-refresh"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div style="overflow: auto;">
+                        <div id="weekly-statistics-pivot" class="pivotHolder statistic-chart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-lg-4 portlets">
+            <div id="customer-vendor" class="widget">
+                <div class="widget-header transparent">
+                    <h2><strong>Customer</strong>/ Vendor</h2>
+                    <div class="additional-btn">
+                        <a href="#" class="hidden reload"><i class="fa fa-refresh"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div style="overflow: auto;">
+                        <div id="customer-vendor-pivot" class="pivotHolder statistic-chart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+    <div class="row">
+        <div class="col-lg-12 portlets">
+            <div id="scvd" class="widget">
+                <div class="widget-header transparent">
+                    <h2><strong>Country</strong> Customer/Vendor</h2>
+                    <div class="additional-btn">
+                        <a href="#" class="hidden reload"><i class="fa fa-refresh"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div style="overflow: auto;">
+                        <div id="scvd-pivot" class="pivotHolder statistic-chart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div layout:fragment="script">
+    <script th:src="@{/assets/libs/moment/moment.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone.min.js}"></script>
+    <script th:src="@{/assets/libs/moment/moment-timezone-data.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/pivot.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/export_renderers.min.js}"></script>
+    <script th:src="@{/assets/libs/pivottable/nrecopivottableext.js}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+    <script th:src="@{/assets/libs/pivottable/c3_renderers.min.js}"></script>
+    <script>
+        // <![CDATA[
+        $(function() {
+
+            var dateFormat =       $.pivotUtilities.derivers.dateFormat;
+            var sortAs =           $.pivotUtilities.sortAs;
+            var tpl =              $.pivotUtilities.aggregatorTemplates;
+
+
+            var nrecoPivotExt = new NRecoPivotTableExtensions({
+                wrapWith: '<div class="pvtTableRendererHolder"></div>',  // special div is needed by fixed headers when used with pivotUI
+                fixedHeaders : true
+            });
+
+            $.extend({}, $.pivotUtilities.renderers,$.pivotUtilities.c3_renderers);
+
+            var stdRendererNames = ["Table","Table Barchart","Heatmap","Row Heatmap","Col Heatmap"];
+            var wrappedRenderers = $.extend( {}, $.pivotUtilities.renderers,$.pivotUtilities.c3_renderers);
+            $.each(stdRendererNames, function() {
+                var rName = this;
+                wrappedRenderers[rName] = nrecoPivotExt.wrapTableRenderer(wrappedRenderers[rName]);
+            });
+
+
+            var getAggregator = function (aggregatorName,vals) {
+                return $.pivotUtilities.aggregators[aggregatorName](vals);
+            };
+
+            var getRenderer = function(rendererName) {
+                if($.inArray(rendererName, ['Table','Table Barchart','Heatmap','Row Heatmap','Col Heatmap']) > -1)
+                    return nrecoPivotExt.wrapTableRenderer($.pivotUtilities.renderers[rendererName]);
+                if($.inArray(rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
+                    return $.pivotUtilities.c3_renderers[rendererName];
+            };
+
+
+            var dailyReport = loadReport('Weekly Traffic');
+
+            dailyReport.done(function (data) {
+                var el = $("#weekly-statistics");
+                blockUI(el);
+                var reportData = JSON.parse(data.templateData);
+                var daily = getData(reportData);
+
+                daily.done(function(grouping){
+                    reloadPivot($('#weekly-statistics-pivot'),grouping,reportData.pivotTemplate);
+                    unblockUI(el);
+                });
+            });
+
+            var customerVendor = loadReport('Customer Vendor');
+
+            customerVendor.done(function (data) {
+               var el = $('#customer-vendor');
+               blockUI(el);
+               var reportData = JSON.parse(data.templateData);
+               var daily = getData(reportData);
+
+               daily.done(function (grouping) {
+                   reloadPivot($('#customer-vendor-pivot'),grouping,reportData.pivotTemplate);
+                   unblockUI(el);
+               });
+            });
+
+            var scvd = loadReport('SCVD')
+
+            scvd.done(function (data) {
+                var el = $('#scvd');
+                blockUI(el);
+                var reportData = JSON.parse(data.templateData);
+                var daily = getData(reportData);
+
+                daily.done(function (grouping) {
+                    reloadPivot($('#scvd-pivot'),grouping,reportData.pivotTemplate);
+                    unblockUI(el);
+                });
+            });
+
+
+            function loadReport(name) {
+                return $.ajax({
+                    type: "GET",
+                    contentType: "application/json",
+                    url: '/api/pivotTemplates/' + name
+                });
+            }
+
+            function getPivotState(pivotUIState) {
+                var pivotState = {};
+                pivotState.aggregator =  getAggregator(pivotUIState.aggregatorName || 'Sum',pivotUIState.vals || ['ceiledDuration']);
+                pivotState.cols = pivotUIState.cols;
+                pivotState.rows = pivotUIState.rows;
+                pivotState.renderer = getRenderer(pivotUIState.rendererName || 'Table')
+                pivotState.rendererOptions = pivotUIState.rendererOptions;
+                return pivotState;
+            };
+
+            function reloadPivot(pivotDiv,jsonData,pivotData) {
+                pivotDiv.pivot(
+                    jsonData, $.extend({
+                        wrapWith: '<div class="pvtTableRendererHolder">>/div>',
+                        derivedAttributes: {
+                            "year":       dateFormat("sigDate", "%y", true),
+                            "month":      dateFormat("sigDate", "%m", true),
+                            "day":        dateFormat("sigDate", "%d", true),
+                            "month name": dateFormat("sigDate", "%n", true),
+                            "day name":   dateFormat("sigDate", "%w", true)
+                        },
+                        sorters: function(attr) {
+                            if(attr == "month name") {
+                                return sortAs(["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]);
+                            }
+                            if(attr == "day name") {
+                                return sortAs(["Mon","Tue","Wed", "Thu","Fri","Sat","Sun"]);
+                            }
+                        },
+                        filter: function(record) {
+                            return true;
+                        }
+                    },getPivotState(pivotData)));
+            }
+
+            function getData(data) {
+
+                var criteria = {};
+                if( data.hourDiff < 5 ) {
+                    criteria.fromDate = moment().subtract(data.fromDate,'days').subtract(data.hourDiff,'hours').format('YYYY-MM-DDTHH:00:00');
+                    criteria.toDate =  moment().endOf('day').subtract(data.toDate,'days').format('YYYY-MM-DDTHH:00:00');
+                } else {
+                    criteria.fromDate = moment().startOf('day').subtract(data.fromDate,'days').format('YYYY-MM-DDTHH:00:00');
+                    criteria.toDate = moment().endOf('day').subtract(data.toDate,'days').format('YYYY-MM-DDTHH:00:00');
+                }
+
+                criteria.customer = fillArray(data.customer);
+                criteria.vendor = fillArray(data.vendor);
+                criteria.ingressCountryId = fillArray(data.ingressCountryId);
+                criteria.ingressOperatorId = fillArray(data.ingressOperatorId);
+                criteria.egressCountryId = fillArray(data.egressCountryId);
+                criteria.egressOperatorId = fillArray(data.egressOperatorId);
+                criteria.hourly = data.hourly;
+                criteria.connected = data.connected;
+                console.log(criteria);
+                return $.ajax({
+                    "url" : '/api/group',
+                    "type" : "POST",
+                    "contentType" : 'application/json',
+                    "data": JSON.stringify(criteria)
+                });
+            }
+
+            function fillArray(data) {
+                var attribute = [];
+                jQuery.each(data,function (index, value) {
+                    attribute.push(value.id);
+                });
+                return attribute;
+            }
+        });
+        // ]]>
+    </script>
 </div>
 </body>
 </html>

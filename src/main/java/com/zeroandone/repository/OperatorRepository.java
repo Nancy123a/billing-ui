@@ -20,8 +20,8 @@ import java.util.List;
 
 public interface OperatorRepository extends JpaRepository<Operator,Integer>,QueryDslPredicateExecutor<Operator>,QuerydslBinderCustomizer<QOperator> {
 
-    @RestResource(path = "findByCountryName", rel ="findByCountryName")
-    Page<Operator>  findByCountryCountryNameContainingIgnoreCase(@Param("countryName") String countryName, Pageable pageable);
+    @RestResource(path = "findByOperatorName", rel ="findByOperatorName")
+    Page<Operator> findByOperatorNameContainingIgnoreCase(@Param("operatorName") String operatorName, Pageable pageable);
 
     default void customize(QuerydslBindings bindings, QOperator qOperator)
     {

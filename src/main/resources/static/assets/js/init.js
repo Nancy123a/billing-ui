@@ -242,7 +242,7 @@ $('input[type=file]').bootstrapFileInput();
 
 
 //DATE PICKER
-$('.datepicker-input').datepicker();
+$('.datepicker-input').datepicker({'format':'dd-mm-yyyy'});
 
 
 //ICHECK

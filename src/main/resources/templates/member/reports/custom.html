@@ -225,14 +225,14 @@
 
             var getAggregator = function (aggregatorName,vals) {
                 return $.pivotUtilities.aggregators[aggregatorName](vals);
-            }
+            };
 
             var getRenderer = function(rendererName) {
                 if($.inArray(rendererName, ['Table','Table Barchart','Heatmap','Row Heatmap','Col Heatmap']) > -1)
                     return nrecoPivotExt.wrapTableRenderer($.pivotUtilities.renderers[rendererName]);
                 if($.inArray(rendererName, ['Line Chart','Bar Chart','Stacked Bar Chart','Area Chart','Scatter Chart']) > -1)
                     return $.pivotUtilities.c3_renderers[rendererName];
-            }
+            };
 
             // this function keeps parameters that may be configured by the user with pivotUI
             var getPivotUIState = function (pivotOpts) {
@@ -251,14 +251,14 @@
             };
 
             var getPivotState = function (pivotUIState) {
-                var pivotState = {}
+                var pivotState = {};
                 pivotState.aggregator =  getAggregator(pivotUIState.aggregatorName || 'Sum',pivotUIState.vals || ['ceiledDuration']);
                 pivotState.cols = pivotUIState.cols;
                 pivotState.rows = pivotUIState.rows;
                 pivotState.renderer = getRenderer(pivotUIState.rendererName || 'Table')
                 pivotState.rendererOptions = pivotUIState.rendererOptions;
                 return pivotState;
-            }
+            };
 
             var pivotUIState = {};
 
