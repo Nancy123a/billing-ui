@@ -260,7 +260,12 @@
             var nrecoPivotExt = new NRecoPivotTableExtensions({
                 wrapWith: '<div class="pvtTableRendererHolder"></div>',  // special div is needed by fixed headers when used with pivotUI
                 fixedHeaders : true,
-                onSortHandler:function (sortOpts) {console.log(sortOpts);},
+                onSortHandler:function (sortOpts) {
+                    console.log(sortOpts);
+                    pivotUIState.rendererOptions = {
+                        sort : sortOpts
+                    };
+                },
                 drillDownHandler: function (attrFilter) {
                     scvdDetails(attrFilter);
                 }
