@@ -42,14 +42,14 @@
 
 <!-- Left Sidebar Start -->
 <div th:fragment="sidebar" class="left side-menu">
-    <div class="sidebar-inner slimscrollleft">
+    <div class="sidebar-inner slimscrollleft" th:with="currentUser=${#httpServletRequest.userPrincipal?.principal}">
         <!--- Profile -->
         <div class="profile-info">
             <div class="col-xs-4">
                 <a href="profile.html" class="rounded-image profile-image"><img th:src="@{/images/users/user-100.jpg}"/></a>
             </div>
             <div class="col-xs-8">
-                <div class="profile-text">Welcome <b>Jane</b></div>
+                <div class="profile-text">Welcome <b><span th:text="${currentUser?.username}"></span></b></div>
                 <div class="profile-buttons">
                     <a href="javascript:;"><i class="fa fa-envelope-o pulse"></i></a>
                     <a href="#connect" class="open-right"><i class="fa fa-comments"></i></a>
