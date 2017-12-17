@@ -8,6 +8,7 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,11 +20,10 @@ public class CDR {
     @Id
     private long cdrId;
 
-    @Column(columnDefinition = "TINYINT")
-    private int monthDay;
+    private LocalDate sigDate;
 
-    @Column(name = "`day_hour`", columnDefinition = "TINYINT")
-    private int dayHour;
+    @Column(columnDefinition = "TINYINT")
+    private int sigHour;
 
     private LocalDateTime sigConnected;
 
@@ -43,7 +43,6 @@ public class CDR {
 
     private String buyTo;
 
-    @Setter(AccessLevel.NONE)
     private LocalDateTime asigInvite;
 
     private LocalDateTime asigPostDial;
@@ -54,64 +53,42 @@ public class CDR {
 
     private String asigTo;
 
-    
     private String asigToHost;
 
     private String asigCarrierGroup;
 
-    
     private String asigInviteStatus;
 
-    
     private String asigRemoteIp;
 
-    
     private String asigCallId;
 
-    
     private String artpCodec;
 
-    
     private String bsigFrom;
 
-    
     private String bsigFromHost;
 
-    
     private String bsigTo;
 
-    
     private String bsigToHost;
 
-    
     private String bsigCarrierGroup;
 
-    
     private String bsigInviteStatus;
 
-    
     private String bsigRemoteIp;
 
-    
     private String bsigCallId;
 
-    
     private String brtpCodec;
 
-    
     private String buyPerMinChg;
 
-    
     private String sellPerMinChg;
 
     private int ingressCountryId;
     private int ingressOperatorId;
     private int egressCountryId;
     private int egressOperatorId;
-
-    public void setAsigInvite(LocalDateTime asigInvite) {
-        this.asigInvite = asigInvite;
-        this.monthDay = asigInvite.getDayOfMonth();
-        this.dayHour = asigInvite.getHour();
-    }
 }
