@@ -3,8 +3,10 @@ package com.zeroandone.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
@@ -33,7 +35,10 @@ public class SecurityConfiguration  extends WebSecurityConfigurerAdapter {
                 .ignoringAntMatchers("/api/**")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/assets/**").permitAll()
+                .mvcMatchers("/assets/**").permitAll()
+                .mvcMatchers("/").hasAnyRole("EMPLOYEE","PARTNER")
+                .mvcMatchers("/partner/**","/api/partner/group").hasRole("PARTNER")
+                .mvcMatchers("/**").hasRole("EMPLOYEE")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -51,5 +56,6 @@ public class SecurityConfiguration  extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
                 .dataSource(dataSource);
+
     }
 }

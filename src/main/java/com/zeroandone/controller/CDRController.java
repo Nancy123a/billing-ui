@@ -2,20 +2,27 @@ package com.zeroandone.controller;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.FactoryExpression;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.zeroandone.domain.CDRStatistic;
 import com.zeroandone.domain.QCDR;
 import com.zeroandone.domain.ScvdReport;
+import com.zeroandone.domain.UserOperator;
 import com.zeroandone.repository.CDRRepository;
 import com.zeroandone.repository.CdrStatisticDailyRepository;
 import com.zeroandone.repository.CdrStatisticHourlyRepository;
+import com.zeroandone.repository.UserOperatorRepository;
 import com.zeroandone.utility.CDRStatisticCriteria;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class CDRController {
@@ -23,11 +30,13 @@ public class CDRController {
     private final CdrStatisticDailyRepository cdrStatisticDailyRepository;
     private final CdrStatisticHourlyRepository cdrStatisticHourlyRepository;
     private final CDRRepository cdrRepository;
+    private final UserOperatorRepository userOperatorRepository;
 
-    public CDRController(CdrStatisticDailyRepository cdrStatisticDailyRepository, CdrStatisticHourlyRepository cdrStatisticHourlyRepository, CDRRepository cdrRepository) {
+    public CDRController(CdrStatisticDailyRepository cdrStatisticDailyRepository, CdrStatisticHourlyRepository cdrStatisticHourlyRepository, CDRRepository cdrRepository, UserOperatorRepository userOperatorRepository) {
         this.cdrStatisticDailyRepository = cdrStatisticDailyRepository;
         this.cdrStatisticHourlyRepository = cdrStatisticHourlyRepository;
         this.cdrRepository = cdrRepository;
+        this.userOperatorRepository = userOperatorRepository;
     }
 
 
@@ -43,6 +52,32 @@ public class CDRController {
                     Projections.bean(CDRStatistic.class,cdrGroupCriteria.getSelect()),
                     cdrGroupCriteria.getWhere().getValue(),
                     cdrGroupCriteria.getGroupBy(),cdrGroupCriteria.getHavingCondition());
+    }
+
+    @RequestMapping(value="/api/partner/group",method= RequestMethod.POST)
+    public List<CDRStatistic> getPartnerQueryResult(@RequestBody CDRStatisticCriteria cdrGroupCriteria) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<Integer> operators = userOperatorRepository.findAllByUsername(auth.getName()).stream().map(UserOperator::getOperatorId).collect(Collectors.toList());
+
+
+        FactoryExpression<CDRStatistic> factoryExpression = Projections.bean(CDRStatistic.class,cdrGroupCriteria.getSelect());
+        List<Expression<?>> expressionList = cdrGroupCriteria.getGroupBy();
+        Predicate havingCondition = cdrGroupCriteria.getHavingCondition();
+        // Change where to include only the operators
+        cdrGroupCriteria.setEgressOperatorId(operators);
+        Predicate whereCondition = cdrGroupCriteria.getWhere().getValue();
+
+
+        if(!cdrGroupCriteria.isHourly())
+            return cdrStatisticDailyRepository.customFindWithProjection(
+                    factoryExpression,
+                    whereCondition,
+                    expressionList,havingCondition);
+        else
+            return cdrStatisticHourlyRepository.customFindWithProjection(
+                    factoryExpression,
+                    whereCondition,
+                    expressionList,havingCondition);
     }
 
 

@@ -3,6 +3,7 @@ package com.zeroandone.controller;
 import com.zeroandone.repository.PivotTemplateRepository;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -54,8 +55,24 @@ public class DefaultController {
         return modelAndView;
     }
 
+    @GetMapping({"/"})
+    public ModelAndView partnerOrEmployee(HttpServletRequest request) {
 
-    @GetMapping({"/","/dashboard"})
+        ModelAndView modelAndView;
+
+        if (request.isUserInRole("ROLE_EMPLOYEE")) {
+            modelAndView = new ModelAndView("member/dashboard");
+
+        }
+        else {
+            modelAndView = new ModelAndView("redirect:/partner/statistics");
+        }
+        return modelAndView;
+    }
+
+
+
+    @GetMapping({"/dashboard"})
     public ModelAndView dashboard() {
         ModelAndView modelAndView = new ModelAndView("member/dashboard");
         return modelAndView;
