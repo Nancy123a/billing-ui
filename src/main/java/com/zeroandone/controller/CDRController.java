@@ -58,7 +58,10 @@ public class CDRController {
     public List<CDRStatistic> getPartnerQueryResult(@RequestBody CDRStatisticCriteria cdrGroupCriteria) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<Integer> operators = userOperatorRepository.findAllByUsername(auth.getName()).stream().map(UserOperator::getOperatorId).collect(Collectors.toList());
-
+        
+        cdrGroupCriteria.setGrossProfit(false);
+        cdrGroupCriteria.setSellCode(false);
+        cdrGroupCriteria.setBuyCode(false);
 
         FactoryExpression<CDRStatistic> factoryExpression = Projections.bean(CDRStatistic.class,cdrGroupCriteria.getSelect());
         List<Expression<?>> expressionList = cdrGroupCriteria.getGroupBy();
