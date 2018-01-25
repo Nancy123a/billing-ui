@@ -59,4 +59,19 @@ public class CdrStatisticBase {
   @JoinColumn(name="egressOperatorId",insertable = false,updatable = false)
   private Operator egressOperator;
 
+  @Id
+  private int buyCode;
+
+  @Id
+  private String buyPerMinChg;
+
+  @Id
+  private int sellCode;
+
+  @Id
+  private String sellPerMinChg;
+
+  private double buyCharge;
+  private double sellCharge;
+
 }

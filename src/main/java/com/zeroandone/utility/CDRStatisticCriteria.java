@@ -35,6 +35,9 @@ public class CDRStatisticCriteria {
 	private boolean hourly = false;
 	private boolean connected = false;
 	private boolean compareDates = false;
+	private boolean buyCode = false;
+	private boolean sellCode = false;
+	private boolean grossProfit = false;
 
 	public Map getSelect(){
 		Map<String,Expression<?>> select = new HashMap<>();
@@ -58,7 +61,13 @@ public class CDRStatisticCriteria {
         Expression<String> ingressOperatorName = qCdrStatisticBase.ingressOperator.operatorName;
         Expression<String> egressOperatorName = qCdrStatisticBase.egressOperator.operatorName;
 
+        Expression<Integer> buyCode = qCdrStatisticBase.buyCode;
+        Expression<Integer> sellCode = qCdrStatisticBase.sellCode;
+        Expression<String> buyPerMinChg = qCdrStatisticBase.buyPerMinChg;
+        Expression<String> sellPerMinChg = qCdrStatisticBase.sellPerMinChg;
 
+        Expression<Double> buyCharge = qCdrStatisticBase.buyCharge.sum();
+        Expression<Double> sellCharge = qCdrStatisticBase.sellCharge.sum();
 
         select.put("attempts",attempts);
         select.put("sigDate",sigDate);
@@ -85,6 +94,18 @@ public class CDRStatisticCriteria {
         }
         if(getEgressOperatorId().size() > 0) {
             select.put("egressOperatorName",egressOperatorName);
+        }
+        if(isBuyCode()) {
+            select.put("buyCode", buyCode);
+            select.put("buyPerMinChg", buyPerMinChg);
+        }
+        if(isSellCode()) {
+            select.put("sellCode", sellCode);
+            select.put("sellPerMinChg", sellPerMinChg);
+        }
+        if(isGrossProfit()) {
+            select.put("buyCharge", buyCharge);
+            select.put("sellCharge", sellCharge);
         }
 		return select;
 	}
@@ -202,6 +223,16 @@ public class CDRStatisticCriteria {
 
         if(getEgressOperatorId().size() > 0)
             groupBy.add(qCdrStatisticBase.egressOperatorId);
+
+        if(isSellCode()) {
+            groupBy.add(qCdrStatisticBase.sellCode);
+            groupBy.add(qCdrStatisticBase.sellPerMinChg);
+        }
+
+        if(isBuyCode()) {
+            groupBy.add(qCdrStatisticBase.buyCode);
+            groupBy.add(qCdrStatisticBase.buyPerMinChg);
+        }
 
         return groupBy;
     }
