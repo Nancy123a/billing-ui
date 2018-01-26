@@ -27,6 +27,7 @@ $(function() {
     $.fn.select2.defaults.set("placeholder", {id: 'none', text: 'None'});
 
     $('#customer,#vendor').select2({
+        width: "100%",
         dataAdapter: $.fn.select2.amd.require('select2/data/extended-ajax'),
         defaultResults: [{id: 0, text: 'All'}],
         multiple: true,
@@ -57,6 +58,7 @@ $(function() {
     });
 
     $('#icountry,#ecountry').select2({
+        width: "100%",
         dataAdapter: $.fn.select2.amd.require('select2/data/extended-ajax'),
         defaultResults: [{id: 0, text: 'All'}],
         multiple: true,
@@ -87,6 +89,7 @@ $(function() {
     });
 
     $('#ioperator,#eoperator').select2({
+        width: "100%",
         dataAdapter: $.fn.select2.amd.require('select2/data/extended-ajax'),
         defaultResults: [{id: 0, text: 'All'}],
         multiple: true,

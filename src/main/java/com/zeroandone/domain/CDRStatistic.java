@@ -29,6 +29,12 @@ public class CDRStatistic implements Serializable {
 	private String ingressOperatorName;
 	private String egressCountryName;
 	private String egressOperatorName;
+	private int buyCode;
+	private String buyPerMinChg;
+	private int sellCode;
+	private String sellPerMinChg;
+	private double buyCharge;
+	private double sellCharge;
 
 	@Transient
 	@JsonIgnore
@@ -36,9 +42,6 @@ public class CDRStatistic implements Serializable {
 	@Transient
 	@JsonIgnore
 	private double asr;
-	@Transient
-	@JsonIgnore
-	private double gP;
 	@Transient
 	@JsonIgnore
 	private double pdd;
@@ -70,6 +73,10 @@ public class CDRStatistic implements Serializable {
 	@JsonProperty
 	public double getAsr() {
 		return ((double)getConnected() / getAttempts());
+	}
+
+	public double getGrossProfit() {
+		return sellCharge - buyCharge;
 	}
 
 

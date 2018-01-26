@@ -29,5 +29,13 @@ public class CdrStatisticBaseId implements Serializable {
     private int ingressOperatorId;
     @Id
     private int egressOperatorId;
+    @Id
+    private int buyCode;
+    @Id
+    private String buyPerMinChg;
+    @Id
+    private int sellCode;
+    @Id
+    private String sellPerMinChg;
 
 }
