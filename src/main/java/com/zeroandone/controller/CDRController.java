@@ -18,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ public class CDRController {
     private final CdrStatisticHourlyRepository cdrStatisticHourlyRepository;
     private final CDRRepository cdrRepository;
     private final UserOperatorRepository userOperatorRepository;
+    private final LocalDateTime firstOfFeb = LocalDateTime.of(2018,2,1,0,0,0);
 
     public CDRController(CdrStatisticDailyRepository cdrStatisticDailyRepository, CdrStatisticHourlyRepository cdrStatisticHourlyRepository, CDRRepository cdrRepository, UserOperatorRepository userOperatorRepository) {
         this.cdrStatisticDailyRepository = cdrStatisticDailyRepository;
@@ -62,6 +65,9 @@ public class CDRController {
         cdrGroupCriteria.setGrossProfit(false);
         cdrGroupCriteria.setSellCode(false);
         cdrGroupCriteria.setBuyCode(false);
+
+        if(cdrGroupCriteria.getFromDate().isBefore(firstOfFeb))
+            cdrGroupCriteria.setFromDate(firstOfFeb);
 
         FactoryExpression<CDRStatistic> factoryExpression = Projections.bean(CDRStatistic.class,cdrGroupCriteria.getSelect());
         List<Expression<?>> expressionList = cdrGroupCriteria.getGroupBy();

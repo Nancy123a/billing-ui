@@ -5,7 +5,7 @@
 
 	<groupId>com.zeroandone</groupId>
 	<artifactId>billing-ui</artifactId>
-	<version>0.0.9-SNAPSHOT</version>
+	<version>0.0.19-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>billing-ui</name>
