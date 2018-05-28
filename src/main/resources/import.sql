@@ -12,6 +12,9 @@ INSERT INTO AUTHORITIES (USERNAME,AUTHORITY) VALUES ('user','ROLE_EMPLOYEE');
 
 
 
+
+
+
 INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier1','Carrier1');
 INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier2','Carrier2');
 INSERT INTO carrier (carrier_id,carrier_name) VALUES ('carrier3','Carrier3');
