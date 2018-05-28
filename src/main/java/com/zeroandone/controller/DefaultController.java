@@ -97,4 +97,7 @@ public class DefaultController {
     public ModelAndView operatorcode() {
         return new ModelAndView("member/admin/operatorcode");
     }
+
+    @GetMapping("/admin/zone")
+    public  ModelAndView zone(){return new ModelAndView("member/admin/zone");}
 }
