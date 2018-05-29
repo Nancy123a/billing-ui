@@ -263,13 +263,11 @@
 
 
             $("#okDelete").click(function () {
-                    var formData = {zoneId:datas.zoneId,zoneName:datas.zoneName,code:datas.code,rate:datas.rate};
+                    var formData = {zoneId:datas.zoneId};
                     $.ajax({
                         type: "DELETE",
                         contentType: "application/json",
-                        url: "/api/zones/deleteZone",
-                        data: JSON.stringify(formData),
-                        dataType: 'json',
+                        url: "/api/zones/"+datas.zoneId,
                         success: function (result) {
                             $('#myModalDelete .close').click();
                             table.ajax.reload();
@@ -278,6 +276,7 @@
                             $('#myModalDelete .close').click();
                         }
                     });
+
             }
             );
 
@@ -324,7 +323,7 @@
                     var el = $("#mainWidget");
                     blockUI(el);
 
-                    var url = "/api/zones/all";
+                    var url = "/api/zones";
 
                     if (data.search != null && data.search.value != "") {
                         url = "/api/zones/findByZoneName?projection=dataTable";
@@ -357,6 +356,7 @@
                     });
 
                     response.fail(function (errorThrown) {
+                        console.log(errorThrown);
                         var errorMessage = (errorThrown.responseJSON) ? errorThrown.responseJSON.message : errorThrown.responseText;
                         $('#errorThrown').html(errorMessage);
                         $('#error').show();
@@ -399,10 +399,10 @@
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
-                    url: "/api/zones/insertZone",
+                    url: "/api/zones",
                     data: JSON.stringify(formData),
-                    dataType: 'json',
                     success: function (result) {
+                        console.log('success');
                         $('#myModal .close').click();
                         $('#zone_name').val("");
                         $('#code').val("");
@@ -410,6 +410,7 @@
                         table.ajax.reload();
                     },
                     error: function (e) {
+                        console.log(e);
                         $('#myModal .close').click();
                         $('#zone_name').val("");
                         $('#code').val("");
@@ -454,11 +455,10 @@
                 $('#errorMessageDivEditCode').css("display","none");
                 $('#errorMessageDivEditRate').css("display","none");
                 $.ajax({
-                    type: "POST",
+                    type: "PUT",
                     contentType: "application/json",
-                    url: "/api/zones/editZone",
+                    url: "/api/zones",
                     data: JSON.stringify(formData),
-                    dataType: 'json',
                     success: function (result) {
                         $('#myModalEdit .close').click();
                         table.ajax.reload();

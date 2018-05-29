@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/api/zones")
+@RequestMapping(value="/api")
 public class ZoneController {
 
     private final ZoneRepository zoneRepository;
@@ -17,32 +17,31 @@ public class ZoneController {
         this.zoneRepository = zoneRepository;
     }
 
-    @GetMapping(value="/all")
+    @GetMapping(value = "/zones")
     public List<Zone> getAllZones(){
         return zoneRepository.findAll();
     }
 
-    @PostMapping(value="/insertZone")
-    public List<Zone> insertZone(@RequestBody Zone zone){
+    @PostMapping(value = "/zones")
+    public void insertZone(@RequestBody Zone zone){
         zoneRepository.saveAndFlush(zone);
-        return zoneRepository.findAll();
-
     }
 
-    @DeleteMapping(value="/deleteZone")
-    public List<Zone> deleteZone(@RequestBody Zone zone){
+
+    @RequestMapping(value = "/zones/{zoneId}", method = RequestMethod.DELETE)
+    public void deleteZone(@PathVariable("zoneId") String zoneId) {
+        Zone zone=zoneRepository.findOne(Integer.valueOf(zoneId));
         zoneRepository.delete(zone);
-        return zoneRepository.findAll();
     }
 
-    @PostMapping(value="/editZone")
-    public List<Zone> editZone(@RequestBody Zone zone){
-        zoneRepository.delete(zoneRepository.getOne(zone.getZoneId()));
+
+    @PutMapping(value = "/zones")
+    public void editZone(@RequestBody Zone zone){
+        zoneRepository.delete(zoneRepository.findOne(zone.getZoneId()));
         zoneRepository.save(zone);
-        return zoneRepository.findAll();
     }
 
-    @GetMapping(value="/findByZoneName")
+    @GetMapping(value="/zones/findByZoneName")
     public List<Zone> findByZoneName(@RequestParam String zoneName){
         List<Zone> zones=zoneRepository.findAll();
         List<Zone> zone_array=new ArrayList<>();
