@@ -271,12 +271,7 @@
 
                     if (data.search != null && data.search.value != "") {
                         url = "/api/countries/search/findByCountryName?projection=dataTable";
-                        console.log(url);
                     }
-                    console.log((data.search.value != null) ? data.search.value : '');
-                    console.log(data.length);
-                    console.log((data.start == 0) ? 0 : (data.start / data.length));
-                    console.log(data.columns[data.order[0].column].data + ',' + data.order[0].dir);
 
                     var response = $.ajax({
                         "url": url,
@@ -289,7 +284,6 @@
                     });
 
                     response.done(function (json) {
-                        console.log(url);
                         var result = {};
                         result.data = json._embedded.countries;
                         if (json.page != null) {

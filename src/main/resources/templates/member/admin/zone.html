@@ -17,8 +17,8 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12 portlets">
-            <div class="widget">
+        <div class="col-md-12">
+            <div id="mainWidget" class="widget">
                 <div class="widget-header">
                     <div class="additional-btn">
                         <a href="#" class=""><i class="fa fa-search"></i> </a>
@@ -313,7 +313,8 @@
                      {"data": 'rate'},
                      {
                          "data": null,
-                         "defaultContent":actionEditButtons()
+                         "defaultContent":actionEditButtons(),
+                         "orderable": false
                      }
 
 
@@ -325,13 +326,10 @@
 
                     var url = "/api/zones";
 
-                    if (data.search != null && data.search.value != "") {
-                        url = "/api/zones/findByZoneName?projection=dataTable";
-                    }
-
                     var response = $.ajax({
                         "url": url,
                         "data": {
+                            projection: 'dataTable',
                             zoneName: (data.search.value != null) ? data.search.value : '',
                             size: data.length,
                             page: (data.start == 0) ? 0 : (data.start / data.length),
@@ -340,18 +338,17 @@
                     });
 
                     response.done(function (json) {
+                        console.log("success reload table state");
                         var result = {};
-                        result.data = json;
-                        if(recordsTotal==0){
-                            if(result.data!=null && result.data.length>0) {
-                                recordsTotal = result.data.length;
+                        result.data = json._embedded.zones;
+                        if (json.page != null) {
+                            if (recordsTotal == 0) {
+                                recordsTotal = json.page.totalElements;
                             }
-                            else{
-                                recordsTotal=0;
-                            }
+                            result.recordsTotal = recordsTotal;
+                            result.recordsFiltered = json.page.totalElements;
                         }
-                        result.recordsTotal=recordsTotal;
-                        result.recordsFiltered =recordsTotal;
+
                         callback(result);
                     });
 
@@ -374,8 +371,9 @@
         $("#buttonAdd").click(function(){
             var zonename = $('#zone_name').val();
             var code=parseInt($('#code').val(), 10);
+            var zoneId=parseInt(0, 10);
             var rate=parseFloat($('#rate').val(), 10);
-            var zoneId=Math.floor(Math.random()*4013);
+
             var formData = {zoneId:zoneId,zoneName:zonename,code:code,rate:rate};
             if(zonename===null || zonename===""){
                 $('#errorMessageDivAddName').css("display", "block");
@@ -401,13 +399,14 @@
                     contentType: "application/json",
                     url: "/api/zones",
                     data: JSON.stringify(formData),
+                    dataType: 'json',
                     success: function (result) {
                         console.log('success');
+                        table.ajax.reload();
                         $('#myModal .close').click();
                         $('#zone_name').val("");
                         $('#code').val("");
                         $('#rate').val("");
-                        table.ajax.reload();
                     },
                     error: function (e) {
                         console.log(e);
@@ -434,7 +433,7 @@
             var zone_name = $('#zone_name_edit').val();
             var code=$('#code_edit').val();
             var rate=$('#rate_edit').val();
-            var formData = {zoneId:zone_id,zoneName:zone_name,code:code,rate:rate};
+            var formData = {zoneName:zone_name,code:code,rate:rate};
             if(zone_name===null || zone_name===""){
                 $('#errorMessageDivEditName').css("display", "block");
                 $('#errorMessageDivEditCode').css("display","none");
@@ -457,13 +456,16 @@
                 $.ajax({
                     type: "PUT",
                     contentType: "application/json",
-                    url: "/api/zones",
+                    url: "/api/zones/"+zone_id,
                     data: JSON.stringify(formData),
+                    dataType: 'json',
                     success: function (result) {
+                        console.log("success edit");
                         $('#myModalEdit .close').click();
                         table.ajax.reload();
                     },
                     error: function (e) {
+                        console.log("fail edit");
                         $('#myModalEdit .close').click();
                     }
                 });
