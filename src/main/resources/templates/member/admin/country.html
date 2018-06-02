@@ -286,7 +286,6 @@
                     response.done(function (json) {
                         var result = {};
                         result.data = json._embedded.countries;
-
                         if (json.page != null) {
                             if (recordsTotal == 0) {
                                 recordsTotal = json.page.totalElements;
