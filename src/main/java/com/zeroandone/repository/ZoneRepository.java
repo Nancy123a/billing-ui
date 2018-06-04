@@ -3,8 +3,7 @@ package com.zeroandone.repository;
 
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
-import com.zeroandone.domain.QZone;
-import com.zeroandone.domain.Zone;
+import com.zeroandone.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
