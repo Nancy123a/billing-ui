@@ -16,7 +16,6 @@ public class CountryCode {
     private int countryCodeId;
 
     private int code;
-
     private int countryId;
 
     @OneToOne(fetch=FetchType.LAZY)
