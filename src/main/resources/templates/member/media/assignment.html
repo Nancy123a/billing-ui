@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      layout:decorator="layout"
+      xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Assignment</title>
+    <link th:href="@{/assets/libs/jquery-datatables/css/dataTables.bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2-bootstrap.min.css}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Heading Start -->
+    <div class="page-heading">
+        <h1><i class='fa fa-file'></i>Assignment</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 portlets">
+            <div class="widget">
+                <div class="widget-header">
+                    <h2>Assignment Table</h2>
+                    <div class="additional-btn">
+                        <a href="#" class=""><i class="fa fa-search"></i> </a>
+                        <a href="#" class="widget-toggle"><i class="fa fa-chevron-down"></i></a>
+                    </div>
+                </div>
+
+                <div class="widget-content">
+                    <br />
+                    <div class="table-responsive">
+                        <table id="assignmentDT" class="table table-striped table-bordered" cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Assignment Date</th>
+                                <th>Requester</th>
+                                <th>Carrier ID</th>
+                                <th>Prefix</th>
+                                <th>Count</th>
+                                <th>Assignment Type</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addassignmentModal" class="modal fade"  role="dialog" aria-labelledby="label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="label">Add Assignment</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
+                        <button id="btnCloseErrorDivAdd" type="button" class="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </button>
+                        <label id="errorMessageAdd">Please fill missing data</label>
+                    </div>
+                    <form role="form" id="AddassignmentForm">
+                        <div class="form-group">
+                            <label>Assignment Date:</label>
+                            <input type="date" class="form-control"  id="assignment_date"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Requester:</label>
+                            <input type="text" class="form-control" placeholder="Requester" id="requester"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Carrier ID:</label>
+                            <select class="form-control" id="carrierselect" style="width:100%;"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Prefix:</label>
+                            <input type="text" class="form-control" placeholder="Prefix" id="prefix"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Count:</label>
+                            <input type="number" class="form-control" placeholder="Count" id="count"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Assignment Type:</label>
+                            <input type="text" class="form-control" placeholder="Assignment Type" id="assignment_type"/>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-darkblue-1" id="buttonadd">Add Assignment</button>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+
+
+<div layout:fragment="script">
+    <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/dataTables.buttons.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.bootstrap.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.print.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jszip.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/pdfmake.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/vfs_fonts.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.html5.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.extended-ajax.js}"></script>
+
+    <script>
+
+        // <![CDATA[
+        var table;
+        var recordsTotal = 0;
+
+
+        $(function () {
+            $('#assignmentDT').on('init.dt', function() {
+                $('.data-add')
+                    .attr('data-toggle', 'modal')
+                    .attr('data-target', '#addassignmentModal');
+            });
+
+
+            table = $('#assignmentDT').DataTable({
+                dom: '<"row"<"col-xs-4"l><"col-xs-3"f><"col-xs-5"<"pull-right"B>>>rt<"row"<"col-xs-6"i><"col-xs-6"p>>',
+                language: {
+                    "processing": "<h1><i class='fa fa-refresh fa-spin'></i> <strong>Loading</strong></h1>"
+                },
+                searchDelay: 700,
+                processing: true,
+                buttons: [
+                    {
+                        text: 'Add Assignment',
+                        action: function ( ) {
+                            fillCarriers();
+                        },
+                        className: 'data-add'
+                    },
+                    'copyHtml5',
+                    'csvHtml5',
+                    'excelHtml5',
+                    'pdfHtml5',
+                    'print'
+                ],
+                "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+                "pageLength": 10,
+                serverSide: true,
+                paging: true,
+                "columns": [
+                    {"data": 'assignmentId'},
+                    {"data": 'assignmentDate'},
+                    {"data": 'requester'},
+                    {"data":'carrierId'},
+                    {"data":'prefix'},
+                    {"data":'count'},
+                    {"data":'assignmentType'}
+                ],
+                "ajax": function (data, callback, settings) {
+
+                    var el = $("#mainWidget");
+                    blockUI(el);
+
+                    var url = "/api/assignments";
+
+
+                    var response = $.ajax({
+                        "url": url,
+                        "data": {
+                            projection: 'dataTable',
+                            prefix: (data.search.value != null) ? data.search.value : '',
+                            size: data.length,
+                            page: (data.start == 0) ? 0 : (data.start / data.length),
+                            sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
+                        }
+                    });
+
+                    response.done(function (json) {
+                        var result = {};
+                        result.data = json._embedded.assignments;
+                        if (json.page != null) {
+                            if (recordsTotal == 0) {
+                                recordsTotal = json.page.totalElements;
+                            }
+                            result.recordsTotal = recordsTotal;
+                            result.recordsFiltered = json.page.totalElements;
+                        }
+                        callback(result);
+                    });
+
+                    response.fail(function (errorThrown) {
+                        var errorMessage = (errorThrown.responseJSON) ? errorThrown.responseJSON.message : errorThrown.responseText;
+                        $('#errorThrown').html(errorMessage);
+                        $('#error').show();
+                    });
+                },
+            });
+
+            function fillCarriers(){
+                //Check if we already initialized select2
+                if (!$('#carrierselect').hasClass("select2-hidden-accessible")) {
+                    $('#carrierselect').select2({
+                        minimumInputLength: 1,
+                        language: {
+                            inputTooShort: function () {
+                                return "Enter Carriers Name";
+                            }
+                        },
+                        ajax : {
+                            url : "/api/carriers",
+                            quietMillis : 500,
+                            data : function(params) {
+                                return {
+                                    carrierName: params.term,
+                                    page: (params.page || 1) - 1,
+                                    projection: 'select2'
+                                }
+                            },
+                            processResults : function (data,page) {
+                                if (data._embedded)
+                                    return { results: data._embedded.carriers};
+                                else
+                                    return {results: data};
+                            }
+                        },
+                        theme: 'bootstrap'
+                    });
+                } else {
+                    $('#carrierselect').val(null);
+                    $('#carrierselect').trigger('change');
+                }
+            }
+        });
+
+
+        $("#buttonadd").click(function () {
+            var assignment_date = $('#assignment_date').val();
+            var carrier_id = $("#carrierselect").select2('val');
+            var requester=$("#requester").val();
+            var prefix=$("#prefix").val();
+            var count=$("#count").val();
+            var assignmentType=$("#assignment_type").val();
+            if (assignment_date != null && carrier_id !=null && requester !=null && prefix!=null && count!=null && assignmentType!=null
+            && assignment_date!="" && carrier_id!="" && requester!="" && prefix!="" && count!="" && assignmentType!="") {
+                var formData = {assignmentDate:assignment_date,requester:requester,prefix:prefix,count:count,assignmentType:assignmentType,carrierId:carrier_id};
+                var url = "/api/assignments";
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: url,
+                    data: JSON.stringify(formData),
+                    dataType: 'json',
+                    success: function (result) {
+                        table.ajax.reload();
+                        $("#addassignmentModal .close").click();
+                        $("#AddassignmentForm")[0].reset();
+                    },
+                    error: function (e) {
+                        $('#errorMessageDivAdd').css("display", "block");
+                    }
+                });
+            }
+            else {
+                $('#errorMessageDivAdd').css("display", "block");
+            }
+        });
+
+        $('#btnCloseErrorDivAdd').click(function () {
+            $('#errorMessageDivAdd').css("display", "none");
+        });
+
+
+
+        // ]]>
+
+
+    </script>
+</div>
+</body>
+</html>

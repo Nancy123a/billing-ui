@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html layout:decorator="layout"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
+<head>
+    <title>Carrier</title>
+    <link th:href="@{/assets/libs/jquery-datatables/css/dataTables.bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.bootstrap.min.css}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Heading Start -->
+    <div class="page-heading">
+        <h1><i class='fa fa-file'></i>Carrier</h1>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="mainWidget" class="widget">
+                <div class="widget-header">
+                    <h2>Carrier Table</h2>
+                    <div class="additional-btn">
+                        <a href="#" class=""><i class="fa fa-search"></i> </a>
+                        <a href="#" class="widget-toggle"><i class="fa fa-chevron-down"></i></a>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <br />
+                    <div class="table-responsive">
+                        <table id="carrierDT" class="table table-striped table-bordered" cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th>Carrier Id</th>
+                                <th>Carrier Name</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModalAdd" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="label">Add Country</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
+                        <button id="btnCloseErrorDivAdd" type="button" class="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </button>
+                        <label id="errorMessageAdd">Please fill missing data</label>
+                    </div>
+                    <form role="form" id="AddcarrierForm">
+                        <div class="form-group">
+                            <label>Carrier ID:</label>
+                            <input type="text" class="form-control" placeholder="Carrier ID" id="carrier_id"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Carrier Name:</label>
+                            <input type="text" class="form-control" placeholder="Carrier Name" id="carrier_name"/>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+
+                                <div class="col-md-3"></div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-darkblue-1" id="button">Add Carrier
+                                    </button>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+</div>
+
+
+<div layout:fragment="script">
+    <script th:src="@{/assets/libs/jquery-datatables/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/js/dataTables.bootstrap.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/dataTables.buttons.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.bootstrap.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.print.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/jszip.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/pdfmake.min.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/vfs_fonts.js}"></script>
+    <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.html5.min.js}"></script>
+    <script>
+
+        // <![CDATA[
+        var table;
+        var recordsTotal = 0;
+
+        $('#carrierDT').on('init.dt', function() {
+            $('.data-add')
+                .attr('data-toggle', 'modal')
+                .attr('data-target', '#myModalAdd');
+        });
+
+        table = $('#carrierDT').DataTable({
+            dom: '<"row"<"col-xs-4"l><"col-xs-3"f><"col-xs-5"<"pull-right"B>>>rt<"row"<"col-xs-6"i><"col-xs-6"p>>',
+            language: {
+                "processing": "<h1><i class='fa fa-refresh fa-spin'></i> <strong>Loading</strong></h1>"
+            },
+            searchDelay: 700,
+            processing: true,
+            buttons: [
+                {
+                    text: 'Add Carrier',
+                    action: function ( ) {
+
+                    },
+                    className: 'data-add'
+                },
+                'copyHtml5',
+                'csvHtml5',
+                'excelHtml5',
+                'pdfHtml5',
+                'print'
+            ],
+            "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+            "pageLength": 10,
+            serverSide: true,
+            paging: true,
+            "columns": [
+                {"data": 'carrierId'},
+                {"data": 'carrierName'}
+
+            ],
+            "ajax": function (data, callback, settings) {
+
+                var el = $("#mainWidget");
+                blockUI(el);
+
+                var url = "/api/carriers?projection=dataTable";
+
+                if (data.search != null && data.search.value != "") {
+                    url = "/api/carriers/search/findByName?projection=dataTable";
+                }
+
+
+                var response = $.ajax({
+                    "url": url,
+                    "data": {
+                        name: (data.search.value != null) ? data.search.value : '',
+                        size: data.length,
+                        page: (data.start == 0) ? 0 : (data.start / data.length),
+                        sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
+                    }
+                });
+
+                response.done(function (json) {
+                    var result = {};
+                    result.data = json._embedded.carriers;
+                    if (json.page != null) {
+                        if (recordsTotal == 0) {
+                            recordsTotal = json.page.totalElements;
+                        }
+                        result.recordsTotal = recordsTotal;
+                        result.recordsFiltered = json.page.totalElements;
+                    }
+
+                    callback(result);
+                });
+
+                response.fail(function (errorThrown) {
+                    var errorMessage = (errorThrown.responseJSON) ? errorThrown.responseJSON.message : errorThrown.responseText;
+
+                    $('#errorThrown').html(errorMessage);
+                    $('#error').show();
+                });
+
+                response.always(function () {
+                    unblockUI(el);
+                });
+            },
+        });
+
+        $("#button").click(function () {
+            var carrierid= $('#carrier_id').val();
+            var carriername = $('#carrier_name').val();
+
+            if (carriername !=null && carriername !="" && carrierid!=null && carrierid!="") {
+                var el = $("#myModalAdd");
+                blockUI(el);
+                var formData = {carrierId:carrierid,carrierName: carriername};
+                var url = "/api/carriers";
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: url,
+                    data: JSON.stringify(formData),
+                    dataType: 'json',
+                    success: function (result) {
+
+                        table.ajax.reload();
+                        $("#myModalAdd .close").click();
+                        $("#AddcarrierForm")[0].reset();
+                        unblockUI(el);
+                    },
+                    error: function (e) {
+                        alert("Error " + e);
+                    }
+                });
+            }
+            else {
+                $('#errorMessageDivAdd').css("display", "block");
+            }
+        });
+
+        $('#btnCloseErrorDivAdd').click(function () {
+            $('#errorMessageDivAdd').css("display", "none");
+        });
+
+
+        // ]]>
+
+
+    </script>
+</div>
+</body>
+</html>
+
+
