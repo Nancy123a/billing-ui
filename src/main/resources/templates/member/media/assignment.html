@@ -78,7 +78,7 @@
                             <input type="text" class="form-control" placeholder="Requester" id="requester"/>
                         </div>
                         <div class="form-group">
-                            <label>Carrier ID:</label>
+                            <label>Carrier Name:</label>
                             <select class="form-control" id="carrierselect" style="width:100%;"/>
                         </div>
                         <div class="form-group">
@@ -226,7 +226,7 @@
                         minimumInputLength: 1,
                         language: {
                             inputTooShort: function () {
-                                return "Enter Carriers Name";
+                                return "Enter Carrier Name";
                             }
                         },
                         ajax : {
@@ -253,44 +253,45 @@
                     $('#carrierselect').trigger('change');
                 }
             }
+
+            $("#buttonadd").click(function () {
+                var assignment_date = $('#assignment_date').val();
+                var carrier_id = $("#carrierselect").select2('val');
+                var requester=$("#requester").val();
+                var prefix=$("#prefix").val();
+                var count=$("#count").val();
+                var assignmentType=$("#assignment_type").val();
+                if (assignment_date != null && carrier_id !=null && requester !=null && prefix!=null && count!=null && assignmentType!=null
+                    && assignment_date!="" && carrier_id!="" && requester!="" && prefix!="" && count!="" && assignmentType!="") {
+                    var formData = {assignmentDate:assignment_date,requester:requester,prefix:prefix,count:count,assignmentType:assignmentType,carrierId:carrier_id};
+                    var url = "/api/assignments";
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json",
+                        url: url,
+                        data: JSON.stringify(formData),
+                        dataType: 'json',
+                        success: function (result) {
+                            table.ajax.reload();
+                            $("#addassignmentModal .close").click();
+                            $("#AddassignmentForm")[0].reset();
+                        },
+                        error: function (e) {
+                            $('#errorMessageDivAdd').css("display", "block");
+                        }
+                    });
+                }
+                else {
+                    $('#errorMessageDivAdd').css("display", "block");
+                }
+            });
+
+            $('#btnCloseErrorDivAdd').click(function () {
+                $('#errorMessageDivAdd').css("display", "none");
+            });
         });
 
 
-        $("#buttonadd").click(function () {
-            var assignment_date = $('#assignment_date').val();
-            var carrier_id = $("#carrierselect").select2('val');
-            var requester=$("#requester").val();
-            var prefix=$("#prefix").val();
-            var count=$("#count").val();
-            var assignmentType=$("#assignment_type").val();
-            if (assignment_date != null && carrier_id !=null && requester !=null && prefix!=null && count!=null && assignmentType!=null
-            && assignment_date!="" && carrier_id!="" && requester!="" && prefix!="" && count!="" && assignmentType!="") {
-                var formData = {assignmentDate:assignment_date,requester:requester,prefix:prefix,count:count,assignmentType:assignmentType,carrierId:carrier_id};
-                var url = "/api/assignments";
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json",
-                    url: url,
-                    data: JSON.stringify(formData),
-                    dataType: 'json',
-                    success: function (result) {
-                        table.ajax.reload();
-                        $("#addassignmentModal .close").click();
-                        $("#AddassignmentForm")[0].reset();
-                    },
-                    error: function (e) {
-                        $('#errorMessageDivAdd').css("display", "block");
-                    }
-                });
-            }
-            else {
-                $('#errorMessageDivAdd').css("display", "block");
-            }
-        });
-
-        $('#btnCloseErrorDivAdd').click(function () {
-            $('#errorMessageDivAdd').css("display", "none");
-        });
 
 
 

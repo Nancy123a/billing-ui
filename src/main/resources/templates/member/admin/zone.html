@@ -57,26 +57,12 @@
                     </div>
 
                     <div class="modal-body">
-                    <div id="errorMessageDivAddName" class="alert alert-danger" style="display: none;">
-                    <button id="btnCloseErrorDivAddName" type="button" class="close">
-                        <i class="ace-icon fa fa-times"></i>
-                    </button>
-                    <label id="errorMessageAddName">Please Enter Zone Name</label>
-                    </div>
-
-                    <div id="errorMessageDivAddID" class="alert alert-danger" style="display: none;">
-                        <button id="btnCloseErrorDivAddID" type="button" class="close">
-                            <i class="ace-icon fa fa-times"></i>
-                        </button>
-                        <label id="errorMessageAddID">Please Enter Zone Code (Number)</label>
-                    </div>
-
-                    <div id="errorMessageDivAddRate" class="alert alert-danger" style="display: none;">
-                        <button id="btnCloseErrorDivAddRate" type="button" class="close">
-                            <i class="ace-icon fa fa-times"></i>
-                        </button>
-                        <label id="errorMessageAddRate">Please Enter Zone Rate ( Number )</label>
-                    </div>
+                        <div id="errorMessageDivAddName" class="alert alert-danger" style="display: none;">
+                            <button id="btnCloseErrorDivAddName" type="button" class="close">
+                                <i class="ace-icon fa fa-times"></i>
+                            </button>
+                            <label id="errorMessageAddName">Please Enter Zone Name</label>
+                        </div>
 
                     <form role="form" id="EditoperatorForm">
 
@@ -130,18 +116,6 @@
                             <i class="ace-icon fa fa-times"></i>
                         </button>
                         <label id="errorMessageEditName">Please Enter Zone Name</label>
-                    </div>
-                    <div id="errorMessageDivEditCode" class="alert alert-danger" style="display: none;">
-                        <button id="btnCloseErrorDivEditCode" type="button" class="close">
-                            <i class="ace-icon fa fa-times"></i>
-                        </button>
-                        <label id="errorMessageEditCode">Please Enter Zone Code</label>
-                    </div>
-                    <div id="errorMessageDivEditRate" class="alert alert-danger" style="display: none;">
-                        <button id="btnCloseErrorDivEditRate" type="button" class="close">
-                            <i class="ace-icon fa fa-times"></i>
-                        </button>
-                        <label id="errorMessageEditRate">Please Enter Zone Rate</label>
                     </div>
                     <form role="form" id="AddoperatorForm">
                         <div class="form-group">
@@ -377,23 +351,18 @@
             var formData = {zoneId:zoneId,zoneName:zonename,code:code,rate:rate};
             if(zonename===null || zonename===""){
                 $('#errorMessageDivAddName').css("display", "block");
-                $('#errorMessageDivAddID').css("display","none");
-                $('#errorMessageDivAddRate').css("display","none");
+                $("#errorMessageAddName").text("Please Enter Zone Name");
             }
             else if(isNaN(code) || code===0){
-                $('#errorMessageDivAddName').css("display", "none");
-                $('#errorMessageDivAddID').css("display","block");
-                $('#errorMessageDivAddRate').css("display","none");
+                $('#errorMessageDivAddName').css("display", "block");
+                $("#errorMessageAddName").text("Please Enter Zone Code ( Number )");
             }
             else if(isNaN(rate) || rate===0){
-                $('#errorMessageDivAddName').css("display", "none");
-                $('#errorMessageDivAddID').css("display","none");
-                $('#errorMessageDivAddRate').css("display","block");
+                $('#errorMessageDivAddName').css("display", "block");
+                $("#errorMessageAddName").text("Please Enter Zone Rate ( Number )");
             }
            else {
                 $('#errorMessageDivAddName').css("display", "none");
-                $('#errorMessageDivAddID').css("display","none");
-                $('#errorMessageDivAddRate').css("display","none");
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
@@ -436,23 +405,18 @@
             var formData = {zoneName:zone_name,code:code,rate:rate};
             if(zone_name===null || zone_name===""){
                 $('#errorMessageDivEditName').css("display", "block");
-                $('#errorMessageDivEditCode').css("display","none");
-                $('#errorMessageDivEditRate').css("display","none");
+                $("#errorMessageEditName").text("Please Enter Zone Name");
             }
             else if(isNaN(code) || code===0){
-                $('#errorMessageDivEditName').css("display", "none");
-                $('#errorMessageDivEditCode').css("display","block");
-                $('#errorMessageDivEditRate').css("display","none");
+                $('#errorMessageDivEditName').css("display", "block");
+                $("#errorMessageEditName").text("Please Enter Zone Code");
             }
             else if(isNaN(rate) || rate===0){
-                $('#errorMessageDivEditName').css("display", "none");
-                $('#errorMessageDivEditCode').css("display","none");
-                $('#errorMessageDivEditRate').css("display","block");
+                $('#errorMessageDivEditName').css("display", "block");
+                $("#errorMessageEditName").text("Please Enter Zone Rate");
             }
             else {
                 $('#errorMessageDivEditName').css("display", "none");
-                $('#errorMessageDivEditCode').css("display","none");
-                $('#errorMessageDivEditRate').css("display","none");
                 $.ajax({
                     type: "PUT",
                     contentType: "application/json",
@@ -476,25 +440,11 @@
             $('#errorMessageDivAddName').css("display", "none");
         });
 
-        $('#btnCloseErrorDivAddID').click(function () {
-            $('#errorMessageDivAddID').css("display", "none");
-        });
-
-        $('#btnCloseErrorDivAddRate').click(function () {
-            $('#errorMessageDivAddRate').css("display", "none");
-        });
 
         $('#btnCloseErrorDivEditName').click(function () {
             $('#errorMessageDivEditName').css("display", "none");
         });
 
-        $('#btnCloseErrorDivEditCode').click(function () {
-            $('#errorMessageDivEditCode').css("display", "none");
-        });
-
-        $('#btnCloseErrorDivEditRate').click(function () {
-            $('#errorMessageDivEditRate').css("display", "none");
-        });
 
         // ]]>
 
