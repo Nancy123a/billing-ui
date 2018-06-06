@@ -8,6 +8,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
+
 public class MRange {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

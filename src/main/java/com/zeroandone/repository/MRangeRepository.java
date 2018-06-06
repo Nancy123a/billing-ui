@@ -10,6 +10,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 public interface MRangeRepository extends JpaRepository<MRange, Integer>,QueryDslPredicateExecutor<MRange>,QuerydslBinderCustomizer<QMRange> {
 
+    
     default void customize(QuerydslBindings bindings, QMRange qmRange)
     {
         bindings.bind(qmRange._From).first((StringPath path, String value) -> path.containsIgnoreCase(value));

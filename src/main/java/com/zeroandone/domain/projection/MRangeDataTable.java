@@ -7,6 +7,7 @@ import org.springframework.data.rest.core.config.Projection;
 
 @Projection(name = "dataTable", types = MRange.class)
 public interface MRangeDataTable {
+
     int getRangeId();
     String getCarrierId();
     Carrier getCarrier();
