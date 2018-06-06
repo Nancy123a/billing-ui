@@ -72,6 +72,7 @@ public class DefaultController {
 
 
 
+
     @GetMapping({"/dashboard"})
     public ModelAndView dashboard() {
         ModelAndView modelAndView = new ModelAndView("member/dashboard");
@@ -97,4 +98,22 @@ public class DefaultController {
     public ModelAndView operatorcode() {
         return new ModelAndView("member/admin/operatorcode");
     }
+
+    @GetMapping("/admin/zone")
+    public  ModelAndView zone(){return new ModelAndView("member/admin/zone");}
+
+    @GetMapping({"/media/carrier"})
+    public ModelAndView carrier(){return new ModelAndView("member/media/carrier");}
+
+    @GetMapping({"/media/ranges"})
+    public ModelAndView ranges(){return new ModelAndView("member/media/ranges");}
+
+    @GetMapping({"/media/random"})
+    public ModelAndView random(){return new ModelAndView("member/media/random");}
+
+    @GetMapping({"/media/assignment"})
+    public ModelAndView assignment(){return new ModelAndView("member/media/assignment");}
+
+
+
 }
