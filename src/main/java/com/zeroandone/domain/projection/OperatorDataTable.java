@@ -14,5 +14,8 @@ public interface OperatorDataTable {
     Country getCountry();
     LocalDate getActivationDate();
     LocalDate getDeactivationDate();
+    int getCountryId();
+    int getObsolete();
+    short getTypeId();
 
 }

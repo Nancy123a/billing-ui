@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html layout:decorator="layout"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4" lang="en">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      layout:decorator="layout"
+      xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <title>Operator</title>
     <link th:href="@{/assets/libs/jquery-datatables/css/dataTables.bootstrap.min.css}" rel="stylesheet" type="text/css" />
     <link th:href="@{/assets/libs/jquery-datatables/extensions/Buttons/css/buttons.bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/libs/bootstrap-select2/css/select2-bootstrap.min.css}" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div layout:fragment="content">
@@ -43,6 +45,8 @@
                                 <th>CountryName </th>
                                 <th>Activation Date</th>
                                 <th>Deactivation Date</th>
+                                <th>Obsolete</th>
+                                <th>Type ID</th>
                                 <th>Options</th>
                             </tr>
                             </thead>
@@ -117,12 +121,13 @@
                     <form role="form" id="EditoperatorForm">
 
                         <div class="form-group">
-                            <input type="hidden" class="form-control" placeholder="Operator ID"
-                                   id="EditoperatorId"/>
+                            <input type="hidden" class="form-control" placeholder="Operator ID" id="EditoperatorId"/>
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Operator Name"
-                                   id="Editoperatorname"/>
+                            <input type="hidden" class="form-control" placeholder="Country ID" id="EditcountryId"/>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Operator Name" id="Editoperatorname"/>
                         </div>
 
                         <div class="form-group" >
@@ -131,7 +136,12 @@
                         </div>
                         <div class="form-group" >
                             <input type="date" class="form-control" placeholder="Deactivation Date" id="deactivate" />
-
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control" placeholder="Obsolete" id="obsolete"/>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control" placeholder="type_id" id="type_id"/>
                         </div>
 
                     </form>
@@ -142,14 +152,74 @@
 
                                 <div class="col-md-3"></div>
                                 <div class="col-md-4">
-                                    <button type="submit" class="btn btn-darkblue-1" id="buttonEdit">Edit
-                                        Operator
-                                    </button>
+                                    <button type="submit" class="btn btn-darkblue-1" id="buttonEdit">Edit Operator</button>
                                 </div>
                                 <div class="col-md-3"></div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div id="addoperatorModal" class="modal fade"  role="dialog" aria-labelledby="label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="label">Add Operator</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
+                        <button id="btnCloseErrorDivAdd" type="button" class="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </button>
+                        <label id="errorMessageAdd">Please fill missing data</label>
+                    </div>
+                    <form role="form" id="AddoperatorForm">
+                        <div class="form-group">
+                            <label>Operator Name:</label>
+                            <input type="text" class="form-control" placeholder="Operator Name" id="operator_name"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Country Name:</label>
+                            <select class="form-control" id="countryselect" style="width:100%;"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Obsolete:</label>
+                            <input type="number" class="form-control"  id="_obsolete"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Activation Date:</label>
+                            <input type="date" class="form-control"  id="_activate"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Deactivation Date:</label>
+                            <input type="date" class="form-control"  id="_deactivate"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Type ID:</label>
+                            <input type="number" class="form-control"  id="_type_id"/>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-darkblue-1" id="buttonadd">Add Operator</button>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -169,19 +239,27 @@
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/pdfmake.min.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/vfs_fonts.js}"></script>
     <script th:src="@{/assets/libs/jquery-datatables/extensions/Buttons/js/buttons.html5.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.min.js}"></script>
+    <script th:src="@{/assets/libs/bootstrap-select2/js/select2.extended-ajax.js}"></script>
     <script>
         // <![CDATA[
+
+        var recordsTotal = 0;
+        var table,datas;
+
             function actionButtons() {
-
-
                 return '<div class="btn-group">\n' +
                     '<a title="Edit" class="edit btn btn-darkblue-1" data-toggle="modal" data-target="#myModal"><i class="fa fa-edit"></i></a>' +
                     '<a title="Delete" class="delete btn btn-darkblue-1" data-toggle="modal" data-target="#myModalDelete"><i class="fa fa-times"></i></a>' +
                     '</div>'
             }
 
-            var recordsTotal = 0;
-            var table,datas;
+        $('#operatorDT').on('init.dt', function () {
+            $('.data-add')
+                .attr('data-toggle', 'modal')
+                .attr('data-target', '#addoperatorModal');
+        });
+
            table = $('#operatorDT').DataTable({
                dom: '<"row"<"col-xs-4"l><"col-xs-3"f><"col-xs-5"<"pull-right"B>>>rt<"row"<"col-xs-6"i><"col-xs-6"p>>',
                language: {
@@ -193,6 +271,7 @@
                     {
                         text: 'Add Operator',
                         action: function ( ) {
+                            fillCountries();
                         },
                         className: 'data-add'
                     },
@@ -212,6 +291,8 @@
                     { "data": 'country.countryName'},
                     { "data": 'activationDate'},
                     { "data": 'deactivationDate'},
+                    {"data":'obsolete'},
+                    {"data":'typeId'},
                     { "data": null, "defaultContent": actionButtons()}
                 ],
                 "ajax": function(data, callback,settings){
@@ -221,13 +302,13 @@
                     var url = "/api/operators?projection=dataTable";
 
                     if(data.search != null && data.search.value != "") {
-                        url = "/api/operators/search/findByCountryName?projection=dataTable";
+                        url = "/api/operators/search/findByOperatorName?projection=dataTable";
                     }
 
                     var response = $.ajax({
                         "url": url,
                         "data": {
-                            countryName: (data.search.value != null) ? data.search.value : '',
+                            operatorName: (data.search.value != null) ? data.search.value : '',
                             size: data.length,
                             page: (data.start == 0) ? 0 : (data.start / data.length),
                             sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
@@ -270,6 +351,9 @@
            $('#Editoperatorname').val(data.operatorName);
            $('#activate').val(data.activationDate);
            $('#deactivate').val(data.deactivationDate);
+           $('#obsolete').val(data.obsolete);
+           $('#type_id').val(data.typeId);
+           $('#EditcountryId').val(data.countryId);
   });
 
         $("#buttonEdit").click(function () {
@@ -278,14 +362,14 @@
             var operatorName = $('#Editoperatorname').val();
             var activate = $('#activate').val();
             var deactivate = $('#deactivate').val();
-            var splitact=activate.split('-');
-            var splitdeact=deactivate.split('-');
-            var correctact=splitact[1]+"-"+splitact[2]+"-"+splitact[0];
-            var correctdeac=splitdeact[1]+"-"+splitdeact[2]+"-"+splitdeact[0];
+            var countryId=$('#EditcountryId').val();
+            var obsolete=$("#obsolete").val();
+            var type_id=$("#type_id").val();
 
-          if (operatorName != null && operatorName != "") {
+          if (operatorName != null && operatorName != "" && activate!=null && activate!="" && operatorId!=null && operatorId!=""
+          && deactivate!=null && deactivate!="" && countryId!=null && countryId!="" && obsolete!=null && obsolete!="" && type_id!=null && type_id!="") {
 
-                var formData = {operatorName: operatorName,obsolete:1,activationDate:correctact,deactivationDate:correctdeac,typeId:1};
+                var formData = {operatorName: operatorName,countryId:countryId,obsolete:obsolete,activationDate:activate,deactivationDate:deactivate,typeId:type_id};
 
                 var url = "/api/operators/" + operatorId;
 
@@ -318,28 +402,99 @@
             datas = table.row($(this).parents('tr')).data();
         });
 
+
         $("#okDelete").click(function () {
+                var formData = {operatorId:datas.operatorId};
+                $.ajax({
+                    type: "DELETE",
+                    contentType: "application/json",
+                    url: "/api/operators/"+datas.operatorId,
+                    success: function (result) {
+                        $('#myModalDelete .close').click();
+                        table.ajax.reload();
+                    },
+                    error: function (e) {
+                        $('#myModalDelete .close').click();
+                        $('#errorMessageDivDelete').css("display", "block");
+                    }
+                });
 
-            var url = "/api/operators/" + datas.operatorId;
-            var formData = {};
+            }
+        );
 
-            $.ajax({
-                type: "DELETE",
-                contentType: "application/json",
-                url: url,
-                data: JSON.stringify(formData),
-                dataType: 'json',
-                success: function (result) {
-                    $('#myModalDelete .close').click();
-                    table.ajax.reload();
-                },
-                error: function (e) {
-                    $('#myModalDelete .close').click();
-                    $('#errorMessageDivDelete').css("display", "block");
+        function fillCountries(){
+            if (!$('#countryselect').hasClass("select2-hidden-accessible")) {
+                $('#countryselect').select2({
+                    minimumInputLength: 1,
+                    language: {
+                        inputTooShort: function () {
+                            return "Enter Country Name";
+                        }
+                    },
+                    ajax : {
+                        url : "/api/countries",
+                        quietMillis : 500,
+                        data : function(params) {
+                            return {
+                                countryName: params.term,
+                                page: (params.page || 1) - 1,
+                                projection: 'select2'
+                            }
+                        },
+                        processResults : function (data,page) {
+                            if (data._embedded)
+                                return { results: data._embedded.countries };
+                            else
+                                return {results: data};
+                        }
+                    },
+                    theme: 'bootstrap'
+                });
+            } else {
+                $('#countryselect').val(null);
+                $('#countryselect').trigger('change');
+            }
+        }
 
-                }
-            });
+        $("#buttonadd").click(function () {
+            var operator_Name = $("#operator_name").val();
+            var countryName=$("#countryselect").select2('val');
+            var obsolete=$("#_obsolete").val();
+            var deactivate=$("#_deactivate").val();
+            var activate=$("#_activate").val();
+            var typeId=$("#_type_id").val();
+            console.log(operator_Name+"  "+countryName+" "+obsolete+" "+deactivate+" "+activate+" "+typeId);
+            if (operator_Name!=null && operator_Name!="" && countryName!=null && countryName!="" && obsolete!=null && obsolete!="" &&
+                deactivate!=null && deactivate!="" && activate!=null && activate!="" && typeId!=null && typeId!="") {
+                console.log("reach on check");
+                var Data = {operatorName:operator_Name,countryId:countryName,obsolete:obsolete,activationDate:activate,deactivationDate:deactivate,typeId:typeId};
+                var url = "/api/operators";
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: url,
+                    data:JSON.stringify(Data),
+                    dataType: 'json',
+                    success: function (result) {
+                        table.ajax.reload();
+                        $("#addoperatorModal .close").click();
+                        $("#AddoperatorForm")[0].reset();
+                    },
+                    error: function (e) {
+                        console.log(e);
+                        $('#errorMessageDivAdd').css("display", "block");
+                    }
+                });
+            }
 
+            else {
+                console.log("reach but not valid");
+                $('#errorMessageDivAdd').css("display", "block");
+            }
+        });
+
+        $('#btnCloseErrorDivAdd').click(function () {
+            $('#errorMessageDivAdd').css("display", "none");
         });
 
         $('#btnCloseErrorDiv').click(function () {
