@@ -175,7 +175,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div id="addCodeModal" class="modal fade"  role="dialog" aria-labelledby="label"
+    <div id="addoperatorModal" class="modal fade"  role="dialog" aria-labelledby="label"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -183,24 +183,34 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
                     </button>
-                    <h4 class="modal-title" id="label">Add Operator Code</h4>
+                    <h4 class="modal-title" id="label">Operator Code</h4>
                 </div>
                 <div class="modal-body">
                     <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
                         <button id="btnCloseErrorDivAdd" type="button" class="close">
                             <i class="ace-icon fa fa-times"></i>
                         </button>
-                        <label id="errorMessageAdd">Please Enter Country name</label>
+                        <label id="errorMessageAdd">Please fill missing data</label>
                     </div>
-                    <form role="form" id="AddcountryForm">
+                    <form role="form" id="AddoperatorForm">
                         <div class="form-group">
-                            <label>Code</label>
-                            <input type="text" class="form-control" placeholder="Code" id="addcode"/>
+                            <label>Operator Code</label>
+                            <input type="number" class="form-control" placeholder="Code" id="codeoperator"/>
                         </div>
 
                         <div class="form-group">
-                            <label>Operator</label>
-                            <select class="form-control" id="operator" style="width:100%;"/>
+                        <label>Operator</label>
+                        <select class="form-control" id="operator" style="width:100%;"/>
+                    </div>
+
+                        <div class="form-group">
+                            <label>Country</label>
+                            <select class="form-control" id="selectcountry" style="width:100%;"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Operator Name</label>
+                            <input type="text" class="form-control" placeholder="Code" id="operator_name"/>
                         </div>
 
                         <div class="form-group">
@@ -210,6 +220,7 @@
                                 <option value="false">False</option>
                             </select>
                         </div>
+
                         <div class="form-group">
                             <label>Activation Date:</label>
                             <input type="date" class="form-control"  id="addactivate"/>
@@ -229,7 +240,6 @@
                                 <div class="col-md-3"></div>
                                 <div class="col-md-4">
                                     <button type="button" class="btn btn-darkblue-1" id="buttoncode">Add Operator Code
-                                        Operator Code
                                     </button>
                                 </div>
                                 <div class="col-md-3"></div>
@@ -272,7 +282,7 @@
             $('#operatorCodeDT').on('init.dt', function() {
                 $('.data-add')
                     .attr('data-toggle', 'modal')
-                    .attr('data-target', '#addCodeModal');
+                    .attr('data-target', '#addoperatorModal');
             });
             table = $('#operatorCodeDT').DataTable({
                 dom: '<"row"<"col-xs-4"l><"col-xs-3"f><"col-xs-5"<"pull-right"B>>>rt<"row"<"col-xs-6"i><"col-xs-6"p>>',
@@ -286,6 +296,7 @@
                         text: 'Add',
                         action: function ( ) {
                             initializeModel();
+                            fillCountries();
                         },
                         className: 'data-add'
                     },
@@ -481,6 +492,79 @@
                 $('#errorMessageDivEdit').css("display", "block");
             }
         });
+
+        function fillCountries(){
+            if (!$('#selectcountry').hasClass("select2-hidden-accessible")) {
+                $('#selectcountry').select2({
+                    minimumInputLength: 1,
+                    language: {
+                        inputTooShort: function () {
+                            return "Enter Country Name";
+                        }
+                    },
+                    ajax : {
+                        url : "/api/countries",
+                        quietMillis : 500,
+                        data : function(params) {
+                            return {
+                                countryName: params.term,
+                                page: (params.page || 1) - 1,
+                                projection: 'select2'
+                            }
+                        },
+                        processResults : function (data,page) {
+                            if (data._embedded)
+                                return { results: data._embedded.countries };
+                            else
+                                return {results: data};
+                        }
+                    },
+                    theme: 'bootstrap'
+                });
+            } else {
+                $('#selectcountry').val(null);
+                $('#selectcountry').trigger('change');
+            }
+        }
+
+
+
+
+        
+        $("#buttoncode").click(function () {
+            var operator_code = $("#operator").select2('val');
+            var countryId=$("#selectcountry").select2('val');
+            var enabled=$("#addenabled").val();
+            var deactivate=$("#adddeactivate").val();
+            var activate=$("#addactivate").val();
+            var code=$("#codeoperator").val();
+            var operator_name=$("#operator_name").val();
+            if (operator_code!=null && operator_code!="" && enabled!=null && enabled!="" && deactivate!=null && deactivate!="" && activate!=null && activate!=""
+            && countryId!="" && countryId!=null &&  code!=null && code!="" && operator_name!=null && operator_name!="" ) {
+                var Data = {operatorName:operator_name,enabled:enabled,activationDate:activate,deactivationDate:deactivate,code:code,operatorId:operator_code,countryId:countryId};
+                var url = "/api/operatorCodes";
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: url,
+                    data:JSON.stringify(Data),
+                    dataType: 'json',
+                    success: function (result) {
+                        table.ajax.reload();
+                        $("#addoperatorModal .close").click();
+                        $("#AddoperatorForm")[0].reset();
+                    },
+                    error: function (e) {
+                        $('#errorMessageDivAdd').css("display", "block");
+                    }
+                });
+            }
+
+            else {
+                $('#errorMessageDivAdd').css("display", "block");
+            }
+        });
+
         $('#btnCloseErrorDivEdit').click(function () {
             $('#errorMessageDivEdit').css("display", "none");
         });
