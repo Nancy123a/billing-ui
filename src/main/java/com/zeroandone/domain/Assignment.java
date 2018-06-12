@@ -13,10 +13,9 @@ import java.time.LocalDate;
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int assignment_id;
+    private int assignmentId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
-    private LocalDate assignment_Date;
+    private LocalDate assignmentDate;
 
     private String requester;
 
@@ -30,6 +29,6 @@ public class Assignment {
 
     private int count;
 
-    private String assignment_Type;
+    private String assignmentType;
 
 }
