@@ -14,21 +14,21 @@ public class Operator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer operatorId;
+    private int operatorId;
 
     private String operatorName;
 
+    private int countryId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="countryId")
+    @JoinColumn(name="countryId" , insertable = false,updatable = false)
     private Country country;
 
 
     private int obsolete;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate activationDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     private LocalDate deactivationDate;
 
     private short typeId;

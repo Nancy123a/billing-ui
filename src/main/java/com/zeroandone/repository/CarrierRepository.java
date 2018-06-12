@@ -17,7 +17,6 @@ public interface CarrierRepository extends PagingAndSortingRepository <Carrier,S
     @RestResource(path = "findByName", rel ="findByName")
     Page<Carrier> findByCarrierNameContainingIgnoreCase(@Param("name") String name, Pageable pageable);
 
-
     default void customize(QuerydslBindings bindings, QCarrier qCarrier)
     {
         bindings.bind(qCarrier.carrierName).first((StringPath path, String value) -> path.containsIgnoreCase(value));
