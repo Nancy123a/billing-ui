@@ -466,6 +466,7 @@
                     success: function (result) {
                         table.ajax.reload();
                         $("#addCodeModal .close").click();
+                        $("#EditcountrycodeForm")[0].reset();
                     },
                     error: function (e) {
                         $('#errorMessageDivAdd').css("display", "block");

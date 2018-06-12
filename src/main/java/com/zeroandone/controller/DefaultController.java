@@ -105,8 +105,8 @@ public class DefaultController {
     @GetMapping({"/media/carrier"})
     public ModelAndView carrier(){return new ModelAndView("member/media/carrier");}
 
-    @GetMapping({"/media/ranges"})
-    public ModelAndView ranges(){return new ModelAndView("member/media/ranges");}
+    @GetMapping({"/media/range"})
+    public ModelAndView ranges(){return new ModelAndView("member/media/range");}
 
     @GetMapping({"/media/random"})
     public ModelAndView random(){return new ModelAndView("member/media/random");}
