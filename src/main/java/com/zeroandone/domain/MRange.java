@@ -16,6 +16,7 @@ public class MRange {
 
     private String carrierId;
 
+
     @OneToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="carrierId", insertable = false,updatable = false)
     private Carrier carrier;
@@ -28,8 +29,5 @@ public class MRange {
 
     private int assignmentId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignmentId", insertable = false, updatable = false)
-    private Assignment assignment;
 
 }

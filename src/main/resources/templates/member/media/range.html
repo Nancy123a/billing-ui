@@ -65,16 +65,20 @@
                         <button id="btnCloseErrorDivAdd" type="button" class="close">
                             <i class="ace-icon fa fa-times"></i>
                         </button>
-                        <label id="errorMessageAdd">Please fill missing data</label>
+                        <label id="errorMessageAdd"></label>
                     </div>
                     <form role="form" id="AddrangeForm">
                         <div class="form-group">
+                            <div class="form-group">
+                                <label>Range Type:</label>
+                                <select class="form-control" id="rangeType" style="width:100%;">
+                                    <option></option>
+                                    <option>Carrier</option>
+                                    <option>Random</option>
+                                </select>
+                            </div>
                             <label>Carrier Name:</label>
                             <select class="form-control" id="carrierselect" style="width:100%;"/>
-                        </div>
-                        <div class="form-group">
-                            <label>Assignment Prefix:</label>
-                            <select class="form-control" id="assignmentselect" style="width:100%;"/>
                         </div>
                         <div class="form-group">
                             <label>From:</label>
@@ -83,10 +87,6 @@
                         <div class="form-group">
                             <label>To:</label>
                             <input type="number" class="form-control" placeholder="To" id="to"/>
-                        </div>
-                        <div class="form-group">
-                            <label>Range Type:</label>
-                            <input type="text" class="form-control" placeholder="Range Type" id="range_type"/>
                         </div>
                     </form>
                     <div class="row">
@@ -133,7 +133,7 @@
 
 
         $(function () {
-            $('#rangeDT').on('init.dt', function() {
+            $('#rangeDT').on('init.dt', function () {
                 $('.data-add')
                     .attr('data-toggle', 'modal')
                     .attr('data-target', '#addrangeModal');
@@ -150,9 +150,8 @@
                 buttons: [
                     {
                         text: 'Add Range',
-                        action: function ( ) {
+                        action: function () {
                             fillCarriers();
-                           fillAssignments();
                         },
                         className: 'data-add'
                     },
@@ -162,7 +161,7 @@
                     'pdfHtml5',
                     'print'
                 ],
-                "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+                "lengthMenu": [5, 10, 25, 50, 75, 100],
                 "pageLength": 10,
                 serverSide: true,
                 paging: true,
@@ -179,30 +178,26 @@
                     var el = $("#mainWidget");
                     blockUI(el);
 
-                    var url = "/api/mRanges";
+                    var url = "/api/ranges";
 
 
                     var response = $.ajax({
-                        "url": url,
-                        "data": {
-                            projection: 'dataTable',
-                            _From: (data.search.value != null) ? data.search.value : '',
-                            size: data.length,
-                            page: (data.start == 0) ? 0 : (data.start / data.length),
-                            sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
-                        }
+                        "url": url
                     });
 
                     response.done(function (json) {
                         var result = {};
-                        result.data = json._embedded.mRanges;
-                        if (json.page != null) {
-                            if (recordsTotal == 0) {
-                                recordsTotal = json.page.totalElements;
-                            }
-                            result.recordsTotal = recordsTotal;
-                            result.recordsFiltered = json.page.totalElements;
+                        result.data = json;
+                        if(recordsTotal==0){
+                         if(result.data!=null && result.data.length>0) {
+                          recordsTotal = result.data.length;
                         }
+                         else{
+                        recordsTotal=0;
+                         }
+                         }
+                      result.recordsTotal=recordsTotal;
+                      result.recordsFiltered =recordsTotal;
                         callback(result);
                     });
 
@@ -214,7 +209,18 @@
                 }
             });
 
-            function fillCarriers(){
+            $('#rangeType').change(function(){
+                if($(this).val() == "Carrier"){
+                    $('#carrierselect').attr('disabled', false);
+                }
+                if($(this).val() == "Random"){
+                    $('#carrierselect').attr('disabled', true);
+                    $("#carrierselect").empty();
+                }
+
+            });
+
+            function fillCarriers() {
                 //Check if we already initialized select2
                 if (!$('#carrierselect').hasClass("select2-hidden-accessible")) {
                     $('#carrierselect').select2({
@@ -224,19 +230,19 @@
                                 return "Enter Carrier Name";
                             }
                         },
-                        ajax : {
-                            url : "/api/carriers",
-                            quietMillis : 500,
-                            data : function(params) {
+                        ajax: {
+                            url: "/api/carriers",
+                            quietMillis: 500,
+                            data: function (params) {
                                 return {
                                     carrierName: params.term,
                                     page: (params.page || 1) - 1,
                                     projection: 'select2'
                                 }
                             },
-                            processResults : function (data,page) {
+                            processResults: function (data, page) {
                                 if (data._embedded)
-                                    return { results: data._embedded.carriers};
+                                    return {results: data._embedded.carriers};
                                 else
                                     return {results: data};
                             }
@@ -249,81 +255,63 @@
                 }
             }
 
-            function fillAssignments(){
-                //Check if we already initialized select2
-                if (!$('#assignmentselect').hasClass("select2-hidden-accessible")) {
-                    $('#assignmentselect').select2({
-                        minimumInputLength: 1,
-                        language: {
-                            inputTooShort: function () {
-                                return "Enter Assignment Prefix";
-                            }
-                        },
-                        ajax : {
-                            url : "/api/assignments",
-                            quietMillis : 500,
-                            data : function(params) {
-                                return {
-                                    prefix: params.term,
-                                    page: (params.page || 1) - 1,
-                                    projection: 'select2'
+
+            $("#buttonadd").click(function () {
+                var carrier_id = $("#carrierselect").select2('val');
+                var from=$("#from").val();
+                var to=$("#to").val();
+                var rangeType=$("#rangeType").val();
+                if(from!=null && to!=null && from!="" && to!="" && rangeType!=null && rangeType!="") {
+                    if(from.length==10 && to.length==10 && to.startsWith("9613") && from.startsWith("9613") ) {
+                        if(rangeType!="" && rangeType!=null && rangeType=="Carrier" && carrier_id!=null) {
+                            var Data = {
+                                carrierId: carrier_id,
+                                rangeType: rangeType,
+                                _To: to,
+                                _From: from
+                            };
+                            var url = "/api/ranges";
+                            $.ajax({
+                                type: "POST",
+                                contentType: "application/json",
+                                url: url,
+                                data: JSON.stringify(Data),
+                                dataType: 'json',
+                                success: function (result) {
+                                    table.ajax.reload();
+                                    $('#errorMessageDivAdd').css("display", "none");
+                                    $("#addrangeModal .close").click();
+                                    $("#AddrangeForm")[0].reset();
+                                },
+                                error: function (e) {
+                                    $('#errorMessageDivAdd').css("display", "block");
                                 }
-                            },
-                            processResults : function (data,page) {
-                                if (data._embedded)
-                                    return { results: data._embedded.assignments};
-                                else
-                                    return {results: data};
-                            }
-                        },
-                        theme: 'bootstrap'
-                    });
-                } else {
-                    $('#assignmentselect').val(null);
-                    $('#assignmentselect').trigger('change');
-                }
-            }
-
-        });
-
-        $("#buttonadd").click(function () {
-            var assignment_id = $('#assignmentselect').select2('val');
-            var carrier_id = $("#carrierselect").select2('val');
-            var from=$("#from").val();
-            var to=$("#to").val();
-            var rangeType=$("#range_type").val();
-            if (assignment_id != null && carrier_id!=null && from!=null && to!=null && rangeType!=null
-                && assignment_id!="" && carrier_id!="" && from!="" && to!="" && rangeType!="") {
-                var Data = {carrierId:carrier_id,rangeType:rangeType,_To:to,_From:from,assignmentId:assignment_id};
-                var url = "/api/mRanges";
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json",
-                    url: url,
-                    data:JSON.stringify(Data),
-                    dataType: 'json',
-                    success: function (result) {
-                        table.ajax.reload();
-                        $("#addrangeModal .close").click();
-                        $("#AddrangeForm")[0].reset();
-                    },
-                    error: function (e) {
-                        $('#errorMessageDivAdd').css("display", "block");
+                            });
+                        }
+                        else{
+                            /// fill in
+                            $('#errorMessageDivAdd').css("display", "block");
+                            $('#errorMessageAdd').text("Please fill missing data");
+                        }
                     }
-                });
-            }
+                    else{
+                        // lebanon numbers
+                        $('#errorMessageDivAdd').css("display", "block");
+                        $('#errorMessageAdd').text("Lebanon from and To range must be between 9613000000 and 9613999999");
+                    }
+                }
+                else{
+                // fill in the appropriate forms
+                    $('#errorMessageDivAdd').css("display", "block");
+                    $('#errorMessageAdd').text("Please fill missing data");
+                }
+            });
 
-            else {
-                $("#errorMessageAdd").text("Please fill missing data");
-                $('#errorMessageDivAdd').css("display", "block");
-            }
+            $('#btnCloseErrorDivAdd').click(function () {
+                $('#errorMessageDivAdd').css("display", "none");
+            });
+
         });
-
-        $('#btnCloseErrorDivAdd').click(function () {
-            $('#errorMessageDivAdd').css("display", "none");
-        });
-
-
 
         // ]]>
 

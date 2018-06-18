@@ -1,8 +1,10 @@
 package com.zeroandone.domain;
 
+import jdk.nashorn.internal.objects.annotations.Constructor;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -15,11 +17,7 @@ public class Random {
 
     private int rangeId;
 
-    @OneToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name="rangeId", insertable = false,updatable = false)
-    private MRange mRange;
-
-    private int number;
+    private BigInteger  number;
 
     private String carrierId;
 
@@ -29,11 +27,16 @@ public class Random {
 
     private int assignmentId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignmentId", insertable = false, updatable = false)
-    private Assignment assignment;
-
     private LocalDate lastUsed;
 
+    public Random() {
+    }
 
+    public Random(int rangeId,BigInteger number, String carrierId, int assignmentId, LocalDate lastUsed) {
+        this.rangeId=rangeId;
+        this.number = number;
+        this.carrierId = carrierId;
+        this.assignmentId = assignmentId;
+        this.lastUsed = lastUsed;
+    }
 }

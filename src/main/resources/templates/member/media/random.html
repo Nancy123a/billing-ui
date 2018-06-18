@@ -149,9 +149,7 @@
                     {
                         text: 'Add Random',
                         action: function () {
-                            fillRange();
-                            fillCarriers();
-                            fillAssignments();
+
                         },
                         className: 'data-add'
                     },
@@ -178,30 +176,16 @@
                     var el = $("#mainWidget");
                     blockUI(el);
 
-                    var url = "/api/randoms";
+                    var url = "/api/random";
 
 
                     var response = $.ajax({
-                        "url": url,
-                        "data": {
-                            projection: 'dataTable',
-                            carrierId: (data.search.value != null) ? data.search.value : '',
-                            size: data.length,
-                            page: (data.start == 0) ? 0 : (data.start / data.length),
-                            sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
-                        }
+                        "url": url
                     });
 
                     response.done(function (json) {
                         var result = {};
-                        result.data = json._embedded.randoms;
-                        if (json.page != null) {
-                            if (recordsTotal == 0) {
-                                recordsTotal = json.page.totalElements;
-                            }
-                            result.recordsTotal = recordsTotal;
-                            result.recordsFiltered = json.page.totalElements;
-                        }
+                        result.data = json;
                         callback(result);
                     });
 
@@ -210,142 +194,6 @@
                         $('#errorThrown').html(errorMessage);
                         $('#error').show();
                     });
-                }
-            });
-
-            function fillCarriers(){
-                //Check if we already initialized select2
-                if (!$('#carrierselect').hasClass("select2-hidden-accessible")) {
-                    $('#carrierselect').select2({
-                        minimumInputLength: 1,
-                        language: {
-                            inputTooShort: function () {
-                                return "Enter Carrier Name";
-                            }
-                        },
-                        ajax : {
-                            url : "/api/carriers",
-                            quietMillis : 500,
-                            data : function(params) {
-                                return {
-                                    carrierName: params.term,
-                                    page: (params.page || 1) - 1,
-                                    projection: 'select2'
-                                }
-                            },
-                            processResults : function (data,page) {
-                                if (data._embedded)
-                                    return { results: data._embedded.carriers};
-                                else
-                                    return {results: data};
-                            }
-                        },
-                        theme: 'bootstrap'
-                    });
-                } else {
-                    $('#carrierselect').val(null);
-                    $('#carrierselect').trigger('change');
-                }
-            }
-
-            function fillAssignments(){
-                //Check if we already initialized select2
-                if (!$('#assignmentselect').hasClass("select2-hidden-accessible")) {
-                    $('#assignmentselect').select2({
-                        minimumInputLength: 1,
-                        language: {
-                            inputTooShort: function () {
-                                return "Enter Assignment Prefix";
-                            }
-                        },
-                        ajax : {
-                            url : "/api/assignments",
-                            quietMillis : 500,
-                            data : function(params) {
-                                return {
-                                    prefix: params.term,
-                                    page: (params.page || 1) - 1,
-                                    projection: 'select2'
-                                }
-                            },
-                            processResults : function (data,page) {
-                                if (data._embedded)
-                                    return { results: data._embedded.assignments};
-                                else
-                                    return {results: data};
-                            }
-                        },
-                        theme: 'bootstrap'
-                    });
-                } else {
-                    $('#assignmentselect').val(null);
-                    $('#assignmentselect').trigger('change');
-                }
-            }
-
-            function fillRange(){
-                if (!$('#rangeselect').hasClass("select2-hidden-accessible")) {
-                    $('#rangeselect').select2({
-                        minimumInputLength: 1,
-                        language: {
-                            inputTooShort: function () {
-                                return "Enter Range From";
-                            }
-                        },
-                        ajax : {
-                            url : "/api/mRanges",
-                            quietMillis : 500,
-                            data : function(params) {
-                                return {
-                                    _From: params.term,
-                                    page: (params.page || 1) - 1,
-                                    projection: 'select2'
-                                }
-                            },
-                            processResults : function (data,page) {
-                                if (data._embedded)
-                                    return { results: data._embedded.mRanges};
-                                else
-                                    return {results: data};
-                            }
-                        },
-                        theme: 'bootstrap'
-                    });
-                } else {
-                    $('#rangeselect').val(null);
-                    $('#rangeselect').trigger('change');
-                }
-            }
-
-            $("#buttonadd").click(function () {
-                var assignment_id = $('#assignmentselect').select2('val');
-                var carrier_id = $("#carrierselect").select2('val');
-                var range_id=$("#rangeselect").select2('val');
-                var lastused=$("#lastUsed").val();
-                var number=$("#number").val();
-                if (assignment_id != null && carrier_id!=null && range_id!=null && lastused!=null && number!=null
-                && assignment_id!="" && carrier_id!="" && range_id!="" && lastused!="" && number!="") {
-                    var Data = {rangeId:range_id,carrierId:carrier_id,assignmentId:assignment_id,lastUsed:lastused,number:number};
-                    var url = "/api/randoms";
-                    $.ajax({
-                        type: "POST",
-                        contentType: "application/json",
-                        url: url,
-                        data:JSON.stringify(Data),
-                        dataType: 'json',
-                        success: function (result) {
-                            table.ajax.reload();
-                            $("#addrandomModal .close").click();
-                            $("#AddrandomForm")[0].reset();
-                        },
-                        error: function (e) {
-                            $('#errorMessageDivAdd').css("display", "block");
-                        }
-                    });
-                }
-
-                else {
-                    $('#errorMessageDivAdd').css("display", "block");
                 }
             });
 
