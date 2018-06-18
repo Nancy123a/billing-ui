@@ -263,7 +263,7 @@
                 var rangeType=$("#rangeType").val();
                 if(from!=null && to!=null && from!="" && to!="" && rangeType!=null && rangeType!="") {
                     if(from.length==10 && to.length==10 && to.startsWith("9613") && from.startsWith("9613") ) {
-                        if(rangeType!="" && rangeType!=null && rangeType=="Carrier" && carrier_id!=null) {
+                        if((rangeType!="" && rangeType!=null && rangeType=="Carrier" && carrier_id!=null) || (rangeType=="Random" && carrier_id==null)) {
                             var Data = {
                                 carrierId: carrier_id,
                                 rangeType: rangeType,

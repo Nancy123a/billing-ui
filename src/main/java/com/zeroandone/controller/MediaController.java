@@ -39,7 +39,7 @@ public class MediaController {
     @PostMapping(value="/ranges")
     public List<MRange> saveRange(@RequestBody MRange mRange){
         mRangeRepository.save(mRange);
-        if(mRange.getCarrierId()!=null) {
+        if(mRange.getCarrierId()==null) {
                 long _from=Long.parseLong(mRange.get_From());
                 BigInteger _to=new BigInteger(mRange.get_To());
                 for (BigInteger bi = BigInteger.valueOf(_from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
