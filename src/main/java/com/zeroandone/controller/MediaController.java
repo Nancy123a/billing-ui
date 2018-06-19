@@ -34,16 +34,11 @@ public class MediaController {
             ranges=mRangeRepository.findAll(pageRequest);
         }
         else{
-            ranges=mRangeRepository.findBy_From(_From, pageRequest);
+            ranges=mRangeRepository.findBy_FromContainingIgnoreCase(_From, pageRequest);
         }
         return ranges;
     }
 
-
-//    @GetMapping(value="/ranges")
-//    public List<Range> getAllRanges(){
-//        return mRangeRepository.findAll();
-//    }
 
     @PostMapping(value="/ranges")
     public List<Range> saveRange(@RequestBody Range mRange){

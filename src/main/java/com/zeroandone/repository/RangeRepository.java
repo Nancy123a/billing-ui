@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 public interface RangeRepository extends JpaRepository<Range, Integer>,QueryDslPredicateExecutor<Range>,QuerydslBinderCustomizer<QRange> {
 
 
-    Page<Range> findBy_From(@Param("_From") String searchTerm, Pageable pageRequest);
+    Page<Range> findBy_FromContainingIgnoreCase(@Param("_From") String searchTerm, Pageable pageRequest);
 
     default void customize(QuerydslBindings bindings, QRange qmRange)
     {
