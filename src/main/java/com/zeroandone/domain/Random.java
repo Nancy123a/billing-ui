@@ -17,7 +17,7 @@ public class Random {
 
     private int rangeId;
 
-    private BigInteger  number;
+    private String  number;
 
     private String carrierId;
 
@@ -32,7 +32,7 @@ public class Random {
     public Random() {
     }
 
-    public Random(int rangeId,BigInteger number, String carrierId, int assignmentId, LocalDate lastUsed) {
+    public Random(int rangeId,String number, String carrierId, int assignmentId, LocalDate lastUsed) {
         this.rangeId=rangeId;
         this.number = number;
         this.carrierId = carrierId;
