@@ -2,8 +2,8 @@ package com.zeroandone.domain.projection;
 
 import com.zeroandone.domain.Assignment;
 import com.zeroandone.domain.Carrier;
-import com.zeroandone.domain.MRange;
 import com.zeroandone.domain.Random;
+import com.zeroandone.domain.Range;
 import org.springframework.data.rest.core.config.Projection;
 import java.time.LocalDate;
 
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public interface RandomDataTable {
     int getRandomId();
     int getRangeId();
-    MRange getMRange();
+    Range getMRange();
     int getNumber();
     String getCarrierId();
     Carrier getCarrier();

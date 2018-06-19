@@ -1,22 +1,18 @@
 package com.zeroandone.controller;
 
-import com.zeroandone.domain.Carrier;
-import com.zeroandone.domain.MRange;
 import com.zeroandone.domain.Random;
+import com.zeroandone.domain.Range;
 import com.zeroandone.repository.CarrierRepository;
 import com.zeroandone.repository.RandomRepository;
 import com.zeroandone.repository.RangeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -31,13 +27,26 @@ public class MediaController {
         this.randomRepository=randomRepository;
     }
 
-    @GetMapping(value="/ranges")
-    public List<MRange> getAllZones(){
-        return mRangeRepository.findAll();
+    @GetMapping(value="/ranges/findBy_From")
+    public Page<Range> getAllRanges(@RequestParam("_From") String _From,Pageable pageRequest){
+        Page<Range> ranges = null;
+        if(_From==null || _From.equalsIgnoreCase("")) {
+            ranges=mRangeRepository.findAll(pageRequest);
+        }
+        else{
+            ranges=mRangeRepository.findBy_From(_From, pageRequest);
+        }
+        return ranges;
     }
 
+
+//    @GetMapping(value="/ranges")
+//    public List<Range> getAllRanges(){
+//        return mRangeRepository.findAll();
+//    }
+
     @PostMapping(value="/ranges")
-    public List<MRange> saveRange(@RequestBody MRange mRange){
+    public List<Range> saveRange(@RequestBody Range mRange){
         mRangeRepository.save(mRange);
         if(mRange.getCarrierId()==null) {
                 long _from=Long.parseLong(mRange.get_From());

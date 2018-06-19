@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 
-public class MRange {
+public class Range {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int rangeId;
