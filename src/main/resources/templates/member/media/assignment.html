@@ -70,24 +70,24 @@
                     </div>
                     <form role="form" id="AddassignmentForm">
                         <div class="form-group">
-                            <label>Assignment Date:</label>
-                            <input type="date" class="form-control"  id="assignment_date"/>
+                            <label>Assignment Prefix:</label>
+                            <select class="form-control" id="prefix" style="width:100%;"/>
                         </div>
                         <div class="form-group">
-                            <label>Requester:</label>
-                            <input type="text" class="form-control" placeholder="Requester" id="requester"/>
+                            <label>Count:</label>
+                            <input type="number" class="form-control" placeholder="Count" id="count"/>
                         </div>
                         <div class="form-group">
                             <label>Carrier Name:</label>
                             <select class="form-control" id="carrierselect" style="width:100%;"/>
                         </div>
                         <div class="form-group">
-                            <label>Prefix:</label>
-                            <input type="text" class="form-control" placeholder="Prefix" id="prefix"/>
+                            <label>Assignment Date:</label>
+                            <input type="date" class="form-control"  id="assignment_date"/>
                         </div>
                         <div class="form-group">
-                            <label>Count:</label>
-                            <input type="number" class="form-control" placeholder="Count" id="count"/>
+                            <label>Requester:</label>
+                            <input type="text" class="form-control" placeholder="Requester" id="requester"/>
                         </div>
                         <div class="form-group">
                             <label>Assignment Type:</label>
@@ -157,6 +157,7 @@
                         text: 'Add Assignment',
                         action: function ( ) {
                             fillCarriers();
+                            fillAssignmentPrefix();
                         },
                         className: 'data-add'
                     },
@@ -184,13 +185,12 @@
                     var el = $("#mainWidget");
                     blockUI(el);
 
-                    var url = "/api/assignments";
+                    var url = "/api/assignments/findByPrefix";
 
 
                     var response = $.ajax({
-                        "url": url,
+                        url:url,
                         "data": {
-                            projection: 'dataTable',
                             prefix: (data.search.value != null) ? data.search.value : '',
                             size: data.length,
                             page: (data.start == 0) ? 0 : (data.start / data.length),
@@ -200,14 +200,12 @@
 
                     response.done(function (json) {
                         var result = {};
-                        result.data = json._embedded.assignments;
-                        if (json.page != null) {
-                            if (recordsTotal == 0) {
-                                recordsTotal = json.page.totalElements;
-                            }
-                            result.recordsTotal = recordsTotal;
-                            result.recordsFiltered = json.page.totalElements;
+                        result.data = json.content;
+                        if (recordsTotal == 0) {
+                            recordsTotal = json.totalElements;
                         }
+                        result.recordsTotal = recordsTotal;
+                        result.recordsFiltered = json.totalElements;
                         callback(result);
                     });
 
@@ -254,36 +252,41 @@
                 }
             }
 
-            $("#buttonadd").click(function () {
-                var assignment_date = $('#assignment_date').val();
-                var carrier_id = $("#carrierselect").select2('val');
-                var requester=$("#requester").val();
-                var prefix=$("#prefix").val();
-                var count=$("#count").val();
-                var assignmentType=$("#assignment_type").val();
-                if (assignment_date != null && carrier_id !=null && requester !=null && prefix!=null && count!=null && assignmentType!=null
-                    && assignment_date!="" && carrier_id!="" && requester!="" && prefix!="" && count!="" && assignmentType!="") {
-                    var formData = {assignmentDate:assignment_date,requester:requester,prefix:prefix,count:count,assignmentType:assignmentType,carrierId:carrier_id};
-                    var url = "/api/assignments";
-                    $.ajax({
-                        type: "POST",
-                        contentType: "application/json",
-                        url: url,
-                        data: JSON.stringify(formData),
-                        dataType: 'json',
-                        success: function (result) {
-                            table.ajax.reload();
-                            $("#addassignmentModal .close").click();
-                            $("#AddassignmentForm")[0].reset();
+            function fillAssignmentPrefix(){
+                //Check if we already initialized select2
+                if (!$('#prefix').hasClass("select2-hidden-accessible")) {
+                    $('#prefix').select2({
+                        minimumInputLength: 1,
+                        language: {
+                            inputTooShort: function () {
+                                return "Enter Assignment Prefix";
+                            }
                         },
-                        error: function (e) {
-                            $('#errorMessageDivAdd').css("display", "block");
-                        }
+                        ajax : {
+                            url : "/api/random/findByPrefix",
+                            quietMillis : 500,
+                            data : function(params) {
+                                return {
+                                    prefix: params.term,
+                                    page: (params.page || 1) - 1,
+                                    projection: 'select2'
+                                }
+                            },
+                            processResults : function (data,page) {
+                                if (data.content)
+                                    return { results: data.content};
+                            }
+                        },
+                        theme: 'bootstrap'
                     });
+                } else {
+                    $('#prefix').val(null);
+                    $('#prefix').trigger('change');
                 }
-                else {
-                    $('#errorMessageDivAdd').css("display", "block");
-                }
+            }
+
+            $("#buttonadd").click(function () {
+
             });
 
             $('#btnCloseErrorDivAdd').click(function () {
