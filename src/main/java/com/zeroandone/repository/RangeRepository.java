@@ -16,9 +16,8 @@ import java.util.List;
 
 public interface RangeRepository extends JpaRepository<Range, Integer>,QueryDslPredicateExecutor<Range>,QuerydslBinderCustomizer<QRange> {
 
-    // findBy_FromContainingIgnoreCase
-
     Page<Range> findBy_FromContainingIgnoreCase(@Param("_From") String searchTerm, Pageable pageRequest);
+
 
 
     default void customize(QuerydslBindings bindings, QRange qmRange)

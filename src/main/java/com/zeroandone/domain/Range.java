@@ -18,6 +18,7 @@ public class Range {
     private String carrierId;
 
 
+
     @OneToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="carrierId", insertable = false,updatable = false)
     private Carrier carrier;
