@@ -66,12 +66,15 @@
                         <button id="btnCloseErrorDivAdd" type="button" class="close">
                             <i class="ace-icon fa fa-times"></i>
                         </button>
-                        <label id="errorMessageAdd">Please fill missing data</label>
+                        <label id="errorMessageAdd"></label>
                     </div>
                     <form role="form" id="AddassignmentForm">
                         <div class="form-group">
                             <label>Assignment Prefix:</label>
-                            <select class="form-control" id="prefix" style="width:100%;"/>
+                            <input type="number" class="form-control" placeholder="Assignment Prefix" id="prefix" />
+                        </div>
+                        <div>
+                            <label id="freenbs"></label>
                         </div>
                         <div class="form-group">
                             <label>Count:</label>
@@ -157,7 +160,6 @@
                         text: 'Add Assignment',
                         action: function ( ) {
                             fillCarriers();
-                            fillAssignmentPrefix();
                         },
                         className: 'data-add'
                     },
@@ -214,11 +216,10 @@
                         $('#errorThrown').html(errorMessage);
                         $('#error').show();
                     });
-                },
+                }
             });
 
             function fillCarriers(){
-                //Check if we already initialized select2
                 if (!$('#carrierselect').hasClass("select2-hidden-accessible")) {
                     $('#carrierselect').select2({
                         minimumInputLength: 1,
@@ -238,6 +239,7 @@
                                 }
                             },
                             processResults : function (data,page) {
+                                console.log(data);
                                 if (data._embedded)
                                     return { results: data._embedded.carriers};
                                 else
@@ -252,47 +254,90 @@
                 }
             }
 
-            function fillAssignmentPrefix(){
-                //Check if we already initialized select2
-                if (!$('#prefix').hasClass("select2-hidden-accessible")) {
-                    $('#prefix').select2({
-                        minimumInputLength: 1,
-                        language: {
-                            inputTooShort: function () {
-                                return "Enter Assignment Prefix";
-                            }
-                        },
-                        ajax : {
-                            url : "/api/random/findByPrefix",
-                            quietMillis : 500,
-                            data : function(params) {
-                                return {
-                                    prefix: params.term,
-                                    page: (params.page || 1) - 1,
-                                    projection: 'select2'
-                                }
-                            },
-                            processResults : function (data,page) {
-                                if (data.content)
-                                    return { results: data.content};
-                            }
-                        },
-                        theme: 'bootstrap'
-                    });
-                } else {
-                    $('#prefix').val(null);
-                    $('#prefix').trigger('change');
-                }
-            }
+            $("#prefix").keyup( function() {
+                var prefix = $("#prefix").val();
+                console.log(prefix);
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json",
+                    url: "/api/randoms/findByPrefix?number="+prefix,
+                    dataType: 'json',
+                    success: function (result) {
+                        $("#freenbs").text("We have "+result.length+" free random number(s) available");
+                        $("#count").attr({"max":result.length,"min":0});
+                    },
+                    error: function (e) {
+                       console.log(e);
+                    }
+                });
+            });
 
             $("#buttonadd").click(function () {
+               var prefix= $("#prefix").val();
+               var count=$("#count").val();
+               var carrier_name= $("#carrierselect").select2('val');
+               var assignment_date=$("#assignment_date").val();
+               var requester=$("#requester").val();
+               var assignment_type=$("#assignment_type").val();
+               if(prefix!=null && prefix!="" && count!=null && count!="" && carrier_name!=null && carrier_name!="" && assignment_date!=null && assignment_date!=""
+               && requester!=null && requester!="" && assignment_type!=null && assignment_type!=""){
+                   var Data = {
+                       assignmentDate: assignment_date,
+                       requester: requester,
+                       carrierId:carrier_name,
+                       prefix:prefix,
+                       count:count,
+                       assignmentType:assignment_type
+                   };
+                   $.ajax({
+                       type: "POST",
+                       contentType: "application/json",
+                       url: "/api/assignments/saveAssignment",
+                       data: JSON.stringify(Data),
+                       dataType: 'json',
+                       success: function (result) {
+                           table.ajax.reload();
+                           $('#errorMessageDivAdd').css("display", "none");
+                           $("#addassignmentModal .close").click();
+                           $("#AddassignmentForm")[0].reset();
+                       },
+                       error: function (e) {
+                           console.log(e);
+                       }
+                   });
+               }
+               else{
+                   $('#errorMessageDivAdd').css("display", "block");
+                   $('#errorMessageAdd').text("Please fill missing data");
+               }
 
             });
 
             $('#btnCloseErrorDivAdd').click(function () {
                 $('#errorMessageDivAdd').css("display", "none");
             });
+
+            $('#addassignmentModal').on('shown.bs.modal', function (e) {
+               setDate();
+            });
+
+
+            $('#addassignmentModal').on('hidden.bs.modal', function() {
+                $("#AddassignmentForm")[0].reset();
+            });
+
+            function setDate(){
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1; //January is 0!
+                var yyyy = today.getFullYear();
+                if(dd<10){dd='0'+dd}
+                if(mm<10){mm='0'+mm}
+                today = yyyy+"-"+mm+"-"+dd;
+                $("#assignment_date").val(today);
+            }
         });
+
 
 
 

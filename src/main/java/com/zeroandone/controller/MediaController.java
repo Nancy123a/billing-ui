@@ -9,15 +9,11 @@ import com.zeroandone.repository.RandomRepository;
 import com.zeroandone.repository.RangeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 
 @RestController
 @RequestMapping(value="/api")
@@ -67,9 +63,6 @@ public class MediaController {
         return mRangeRepository.findAll();
     }
 
-
-
-
     @GetMapping(value="/random/findByNumber")
     public Page<Random> getAllRandom(@RequestParam("number") String number,Pageable pageRequest){
         Page<Random> randoms = null;
@@ -82,18 +75,6 @@ public class MediaController {
         return randoms;
     }
 
-    @GetMapping(value="/random/findByPrefix")
-    public List<Random> getAllList(@RequestParam("prefix") String prefix){
-        List<Random> randoms=new ArrayList<>();
-        if(prefix!=null && !prefix.equalsIgnoreCase("")){
-            randoms=randomRepository.findAllByNumberStartingWith(prefix);
-        }
-        return randoms;
-    }
-
-//http://localhost:8080/api/random/findByNumber?number=9613000000&size=10&page=0&sort=randomId%2Casc
-
-
     @GetMapping(value="/assignments/findByPrefix")
     public Page<Assignment> getAllAssignments(@RequestParam("prefix") String prefix,Pageable pageable){
         Page<Assignment> assignments=null;
@@ -105,4 +86,29 @@ public class MediaController {
         }
         return  assignments;
     }
+
+    @GetMapping(value="/randoms/findByPrefix")
+    public List<Random> getAllRandomsByPrefix(@RequestParam("number") String number){
+          List<Random> randoms=new ArrayList<>();
+          if(number!=null && !number.equalsIgnoreCase("")){
+              randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(number);
+          }
+          return randoms;
+    }
+
+    @PostMapping(value="/assignments/saveAssignment")
+    public void saveAndgetRandoms(@RequestBody Assignment assignment){
+        List<Random> Random_List=new ArrayList<>();
+        Assignment assignment1=assignmentRepository.save(assignment);
+        if(assignment.getPrefix()!=null && !assignment.getPrefix().equalsIgnoreCase("")){
+            List<Random>randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(assignment.getPrefix());
+            Random_List=randoms.subList(0,assignment.getCount() );
+            for(int i=0;i<Random_List.size();i++){
+                Random _random=Random_List.get(i);
+                Random random=new Random(_random.getRandomId(),_random.getRangeId(),_random.getNumber(),assignment1.getCarrierId(),assignment1.getAssignmentId(),_random.getLastUsed());
+                randomRepository.save(random);
+            }
+        }
+    }
+
 }

@@ -12,6 +12,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -19,7 +20,8 @@ public interface RandomRepository  extends JpaRepository<Random, Integer>,QueryD
 
     Page<Random> findByNumberContainingIgnoreCase(@Param("number") String searchTerm, Pageable pageRequest);
 
-    List<Random> findAllByNumberStartingWith(String number);
+    List<Random> findAllByNumberStartingWithAndCarrierIdIsNull(@Param("number") String number);
+
 
     default void customize(QuerydslBindings bindings, QRandom qRandom)
     {
