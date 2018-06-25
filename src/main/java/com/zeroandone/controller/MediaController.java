@@ -97,7 +97,7 @@ public class MediaController {
     }
 
     @PostMapping(value="/assignments/saveAssignment")
-    public void saveAndgetRandoms(@RequestBody Assignment assignment){
+    public List<Random> saveAndgetRandoms(@RequestBody Assignment assignment){
         List<Random> Random_List=new ArrayList<>();
         Assignment assignment1=assignmentRepository.save(assignment);
         if(assignment.getPrefix()!=null && !assignment.getPrefix().equalsIgnoreCase("")){
@@ -109,6 +109,7 @@ public class MediaController {
                 randomRepository.save(random);
             }
         }
+        return Random_List;
     }
 
 }

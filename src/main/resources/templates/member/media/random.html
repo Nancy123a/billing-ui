@@ -42,6 +42,7 @@
                                 <th>Assignment ID</th>
                                 <th>Number</th>
                                 <th>Last Used</th>
+                                <th>Options</th>
                             </tr>
                             </thead>
                         </table>
@@ -131,6 +132,7 @@
         var table;
         var recordsTotal = 0;
         $(function () {
+
             $('#randomDT').on('init.dt', function () {
                 $('.data-add')
                     .attr('data-toggle', 'modal')
@@ -149,7 +151,6 @@
                     {
                         text: 'Add Random',
                         action: function () {
-
                         },
                         className: 'data-add'
                     },
@@ -169,7 +170,21 @@
                     {"data": 'carrierId'},
                     {"data": 'assignmentId'},
                     {"data": 'number'},
-                    {"data": 'lastUsed'}
+                    {"data": 'lastUsed'},
+                    {
+                        "data": "click button",
+                        "render": function ( data, type, row, meta ) {
+                            if(row.carrierId!=null){
+                                return '<div class="pull-center btn-group">\n' +
+                                    '<a title="Delete" class="free btn btn-danger">Delete</a>'+
+                                    '</div>';
+                            }
+                            else{
+                                return '<div><p></p></div>'
+                            }
+
+                        }
+                    }
                 ],
                 "ajax": function (data, callback, settings) {
 

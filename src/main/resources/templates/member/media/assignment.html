@@ -52,8 +52,7 @@
         </div>
     </div>
 
-    <div id="addassignmentModal" class="modal fade"  role="dialog" aria-labelledby="label"
-         aria-hidden="true">
+    <div id="addassignmentModal" class="modal fade"  role="dialog" aria-labelledby="label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -296,6 +295,7 @@
                        data: JSON.stringify(Data),
                        dataType: 'json',
                        success: function (result) {
+                           console.log(result);
                            table.ajax.reload();
                            $('#errorMessageDivAdd').css("display", "none");
                            $("#addassignmentModal .close").click();
@@ -321,10 +321,6 @@
                setDate();
             });
 
-
-            $('#addassignmentModal').on('hidden.bs.modal', function() {
-                $("#AddassignmentForm")[0].reset();
-            });
 
             function setDate(){
                 var today = new Date();
