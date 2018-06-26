@@ -286,7 +286,6 @@
             });
 
             $("#okDelete").click(function () {
-               console.log(data);
                 var url = "/api/randoms/deleteRandoms";
 
                 $.ajax({
@@ -296,12 +295,10 @@
                     data: JSON.stringify(data),
                     dataType: 'json',
                     success: function (result) {
-                        console.log(result);
                         table.ajax.reload();
                         $('#Delete .close').click();
                     },
                     error: function (e) {
-                        console.log(e);
                         $('#Delete .close').click();
                         $('#errorMessageDivDelete').css("display", "block");
                     }
