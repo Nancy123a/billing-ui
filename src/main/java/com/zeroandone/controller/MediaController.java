@@ -46,13 +46,18 @@ public class MediaController {
     public List<Range> saveRange(@RequestBody Range mRange){
         BigInteger _to=new BigInteger(mRange.get_To());
         if(mRange.getCarrierId()==null) {
-                long _from=Long.parseLong(mRange.get_From());
-                for (BigInteger bi = BigInteger.valueOf(_from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
-                        LocalDate localDateTime = LocalDate.now();
-                        String number=String.valueOf(bi);
-                        Random random = new Random(mRange.getRangeId(),number, mRange.getCarrierId(), mRange.getAssignmentId(), localDateTime);
-                        randomRepository.save(random);
-                }
+            long _from=Long.parseLong(mRange.get_From());
+            for (BigInteger bi = BigInteger.valueOf(_from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
+                LocalDate localDateTime = LocalDate.now();
+                String number=String.valueOf(bi);
+                Random random=new Random();
+                random.setRangeId(mRange.getRangeId());
+                random.setNumber(number);
+                random.setCarrierId(mRange.getCarrierId());
+                random.setAssignmentId(mRange.getAssignmentId());
+                random.setLastUsed(localDateTime);
+                randomRepository.save(random);
+            }
 
         }
         BigInteger _from=new BigInteger(mRange.get_From());
@@ -89,11 +94,11 @@ public class MediaController {
 
     @GetMapping(value="/randoms/findByPrefix")
     public List<Random> getAllRandomsByPrefix(@RequestParam("number") String number){
-          List<Random> randoms=new ArrayList<>();
-          if(number!=null && !number.equalsIgnoreCase("")){
-              randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(number);
-          }
-          return randoms;
+        List<Random> randoms=new ArrayList<>();
+        if(number!=null && !number.equalsIgnoreCase("")){
+            randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(number);
+        }
+        return randoms;
     }
 
     @PostMapping(value="/assignments/saveAssignment")
@@ -106,9 +111,9 @@ public class MediaController {
         if(assignment.getPrefix()!=null && !assignment.getPrefix().equalsIgnoreCase("")){
             List<Random>randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(assignment.getPrefix());
             Random_List=randoms.subList(0,assignment.getCount() );
-            for(int i=0;i<Random_List.size();i++){
-                Random _random=Random_List.get(i);
-                Random random=new Random(_random.getRandomId(),_random.getRangeId(),_random.getNumber(),assignment1.getCarrierId(),assignment1.getAssignmentId(),_random.getLastUsed());
+            for(Random random:Random_List){
+                random.setCarrierId(assignment1.getCarrierId());
+                random.setAssignmentId(assignment1.getAssignmentId());
                 randomRepository.save(random);
             }
         }
@@ -124,8 +129,16 @@ public class MediaController {
         random.setCarrierId(null);
         random.setAssignmentId(0);
         randomRepository.save(random);
-        assignmentRepository.delete(_random.getAssignmentId());
+        Assignment assignment=assignmentRepository.findOne(_random.getAssignmentId());
+        if(assignment.getCount()>1){
+            assignment.setCount(assignment.getCount()-1);
+            assignmentRepository.save(assignment);
+        }
+        else{
+            assignmentRepository.delete(assignment);
+        }
         return random;
     }
 
 }
+
