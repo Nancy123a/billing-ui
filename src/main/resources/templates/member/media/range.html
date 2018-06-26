@@ -18,6 +18,8 @@
         <h1><i class='fa fa-file'></i>Range</h1>
     </div>
 
+
+    
     <div class="row">
         <div class="col-md-12 portlets">
             <div class="widget">
@@ -42,6 +44,8 @@
                                 <th>Carrier ID</th>
                                 <th>Range Type</th>
                                 <th>Assignment ID</th>
+                                <th>Count</th>
+                                <th>Options</th>
                             </tr>
                             </thead>
                         </table>
@@ -56,7 +60,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                    <button type="button" id="close" class="close" data-dismiss="modal" aria-hidden="true">&times;
                     </button>
                     <h4 class="modal-title" id="label">Add Range</h4>
                 </div>
@@ -131,7 +135,6 @@
         var table;
         var recordsTotal = 0;
 
-
         $(function () {
             $('#rangeDT').on('init.dt', function () {
                 $('.data-add')
@@ -171,17 +174,29 @@
                     {"data": '_To'},
                     {"data": 'carrierId'},
                     {"data": 'rangeType'},
-                    {"data": 'assignmentId'}
+                    {"data": 'assignmentId'},
+                    {"data":'count'},
+                    {
+                        "data": "click button",
+                        "render": function ( data, type, row, meta ) {
+                            if(row.rangeId==null){
+                                return '<div class="pull-center btn-group">\n' +
+                                    '<a title="Free" class="free btn btn-success" data-toggle="modal" data-target="#addrangeModal">Free</a>'+
+                                    '</div>';
+                            }
+                            else{
+                                return '<div><p></p></div>'
+                            }
+
+                        }
+                    }
                 ],
                 "ajax": function (data, callback, settings) {
-
-                    console.log(data);
 
                     var el = $("#mainWidget");
                     blockUI(el);
 
                     var url = "/api/ranges/findBy_From";
-
 
                     var response = $.ajax({
                         "url": url,
@@ -189,23 +204,14 @@
                             _From: (data.search.value != null) ? data.search.value : '',
                             size: data.length,
                             page: (data.start == 0) ? 0 : (data.start / data.length),
-                            sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
+                            sort: "_From" + ',' + data.order[0].dir
                         }
 
                     });
 
                     response.done(function (json) {
-                        var result = {};
-                        result.data = json.content;
-                            if (recordsTotal == 0) {
-                                recordsTotal = json.totalElements;
-                            }
-                            result.recordsTotal = recordsTotal;
-                            result.recordsFiltered = json.totalElements;
-
-                        callback(result);
+                        addRowIfFromLessthanPreviousTo(json,callback);
                     });
-
 
                     response.fail(function (errorThrown) {
                         var errorMessage = (errorThrown.responseJSON) ? errorThrown.responseJSON.message : errorThrown.responseText;
@@ -214,6 +220,61 @@
                     });
                 }
             });
+
+            $('#close').click(function() {
+                $('#from').val("");
+                $('#to').val("");
+                $("#carrierselect").val("");
+                $("#rangeType").val("");
+            });
+
+            $('#rangeDT').on('click', 'a.free', function (e) {
+                var data = table.row($(this).parents('tr')).data();
+                $('#from').val(data._From);
+                $('#to').val(data._To);
+                $("#carrierselect").empty();
+            });
+
+            function addRowIfFromLessthanPreviousTo(json,callback) {
+                var sample = {};
+
+                if(json.content.length>1){
+                var utilize=[];
+                for(var i=0; i< json.content.length; i++) {
+                    utilize.push(json.content[i]);
+                    if (i + 1 < json.content.length) {
+                        var _From = json.content[i]['_To'];
+                        var _To = json.content[i + 1]['_From'];
+                        var x = _To - _From;
+                        var _new_From = parseInt(_From) + 1;
+                        if (x > 1) {
+                            var _new_To = parseInt(_To) - 1;
+                            var count = (_new_To - _new_From)+1;
+                            var object = {};
+                            object.rangeId=null;
+                            object.assignmentId=null;
+                            object.rangeType="";
+                            object.carrierId=null;
+                            object._To=_new_To;
+                            object._From=_new_From;
+                            object.count=count;
+                            utilize.push(object);
+                        }
+                    }
+                }
+                sample.data=utilize;
+                }
+                else{
+                    sample.data=json.content;
+                }
+                if (recordsTotal == 0) {
+                    recordsTotal = json.totalElements;
+                }
+                sample.recordsTotal = recordsTotal;
+                sample.recordsFiltered = json.totalElements;
+                callback(sample);
+
+            }
 
 
             $('#rangeType').change(function(){

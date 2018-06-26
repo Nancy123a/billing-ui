@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 @Entity
 @Getter
@@ -17,6 +18,7 @@ public class Range {
     private String carrierId;
 
 
+
     @OneToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="carrierId", insertable = false,updatable = false)
     private Carrier carrier;
@@ -28,6 +30,8 @@ public class Range {
     private String _From;
 
     private int assignmentId;
+
+    private int count;
 
 
 }
