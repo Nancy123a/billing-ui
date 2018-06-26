@@ -44,26 +44,36 @@ public class MediaController {
 
     @PostMapping(value="/ranges")
     public List<Range> saveRange(@RequestBody Range mRange){
+        // from= 9613000000 // to=9613000010
         BigInteger _to=new BigInteger(mRange.get_To());
+        // its random
         if(mRange.getCarrierId()==null) {
             long _from=Long.parseLong(mRange.get_From());
+            // loop from _from to _to
             for (BigInteger bi = BigInteger.valueOf(_from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
+                // get the current date
                 LocalDate localDateTime = LocalDate.now();
+                // number is the bi
                 String number=String.valueOf(bi);
+                // create new random and set values to it
                 Random random=new Random();
                 random.setRangeId(mRange.getRangeId());
                 random.setNumber(number);
                 random.setCarrierId(mRange.getCarrierId());
                 random.setAssignmentId(mRange.getAssignmentId());
                 random.setLastUsed(localDateTime);
+                // save the random
                 randomRepository.save(random);
             }
-
         }
+        // if it skip if statement then its carrier
+        // get count of numbers between from and to
         BigInteger _from=new BigInteger(mRange.get_From());
         BigInteger difference=_to.subtract(_from);
         int diff=difference.intValue()+1;
+        // get the count and set it
         mRange.setCount(diff);
+        // save range
         mRangeRepository.save(mRange);
         return mRangeRepository.findAll();
     }
@@ -96,6 +106,7 @@ public class MediaController {
     public List<Random> getAllRandomsByPrefix(@RequestParam("number") String number){
         List<Random> randoms=new ArrayList<>();
         if(number!=null && !number.equalsIgnoreCase("")){
+            // get all free random number according to prefix that are not assigned to carrier
             randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(number);
         }
         return randoms;
@@ -104,16 +115,28 @@ public class MediaController {
     @PostMapping(value="/assignments/saveAssignment")
     public List<Random> saveAndgetRandoms(@RequestBody Assignment assignment){
         List<Random> Random_List=new ArrayList<>();
-        if(assignment.getPrefix().length()>4){
-            assignment.setPrefix(assignment.getPrefix().substring(0,4));
-        }
-        Assignment assignment1=assignmentRepository.save(assignment);
         if(assignment.getPrefix()!=null && !assignment.getPrefix().equalsIgnoreCase("")){
+
+            // get free array list of randoms that start with certain prefix and have carrier id null ( not assigned to carrier )
             List<Random>randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(assignment.getPrefix());
+
+            // get only first 4 chars from the string because upon assigning single random we send number 9613000000 for example and prefix is 9613
+            if(assignment.getPrefix().length()>4){
+                // set the prefix in assignment
+                assignment.setPrefix(assignment.getPrefix().substring(0,4));
+            }
+
+            // save the assignment
+            Assignment assignment1=assignmentRepository.save(assignment);
+
+            // get the subset of array list according to count
             Random_List=randoms.subList(0,assignment.getCount() );
+            // loop throught the random list
             for(Random random:Random_List){
+                // update carrier id and assignment id
                 random.setCarrierId(assignment1.getCarrierId());
                 random.setAssignmentId(assignment1.getAssignmentId());
+                // save the random
                 randomRepository.save(random);
             }
         }
@@ -122,22 +145,25 @@ public class MediaController {
 
 
 
-
+    // deleting single random by clicking delete button
     @DeleteMapping(value = "/randoms/deleteRandoms")
     public Random DeleteRandom(@RequestBody Random _random){
-        Random random=randomRepository.findOne(_random.getRandomId());
-        random.setCarrierId(null);
-        random.setAssignmentId(0);
-        randomRepository.save(random);
+        _random.setCarrierId(null);
+        _random.setAssignmentId(0);
+        randomRepository.save(_random);
         Assignment assignment=assignmentRepository.findOne(_random.getAssignmentId());
+        // if the count is greater than 1 then update count by decreasing it by 1 else delete the assignment
         if(assignment.getCount()>1){
+            // set the count by decreasing it by 1
             assignment.setCount(assignment.getCount()-1);
+            // save the assignment
             assignmentRepository.save(assignment);
         }
         else{
+            // delete assignment
             assignmentRepository.delete(assignment);
         }
-        return random;
+        return _random;
     }
 
 }

@@ -352,7 +352,6 @@
                                 }
                             },
                             processResults : function (data,page) {
-                                console.log(data);
                                 if (data._embedded)
                                     return { results: data._embedded.carriers};
                                 else
@@ -391,14 +390,14 @@
                         data: JSON.stringify(Data),
                         dataType: 'json',
                         success: function (result) {
-                            console.log(result);
+                          //  console.log(result);
                             table.ajax.reload();
                             $('#errorMessageDivAdd').css("display", "none");
                             $("#Assign .close").click();
                             $("#AssignRandomForm")[0].reset();
                         },
                         error: function (e) {
-                            console.log(e);
+                           // console.log(e);
                         }
                     });
                 }
