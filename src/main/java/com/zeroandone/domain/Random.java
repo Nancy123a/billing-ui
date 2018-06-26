@@ -32,19 +32,4 @@ public class Random {
     public Random() {
     }
 
-    public Random(int rangeId,String number, String carrierId, int assignmentId, LocalDate lastUsed) {
-        this.rangeId=rangeId;
-        this.number = number;
-        this.carrierId = carrierId;
-        this.assignmentId = assignmentId;
-        this.lastUsed = lastUsed;
-    }
-    public Random(int randomId,int rangeId,String number, String carrierId, int assignmentId, LocalDate lastUsed) {
-        this.randomId=randomId;
-        this.rangeId=rangeId;
-        this.number = number;
-        this.carrierId = carrierId;
-        this.assignmentId = assignmentId;
-        this.lastUsed = lastUsed;
-    }
 }
