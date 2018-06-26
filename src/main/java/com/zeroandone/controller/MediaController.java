@@ -46,27 +46,6 @@ public class MediaController {
     public List<Range> saveRange(@RequestBody Range mRange){
         // from= 9613000000 // to=9613000010
         BigInteger _to=new BigInteger(mRange.get_To());
-        // its random
-        if(mRange.getCarrierId()==null) {
-            long _from=Long.parseLong(mRange.get_From());
-            // loop from _from to _to
-            for (BigInteger bi = BigInteger.valueOf(_from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
-                // get the current date
-                LocalDate localDateTime = LocalDate.now();
-                // number is the bi
-                String number=String.valueOf(bi);
-                // create new random and set values to it
-                Random random=new Random();
-                random.setRangeId(mRange.getRangeId());
-                random.setNumber(number);
-                random.setCarrierId(mRange.getCarrierId());
-                random.setAssignmentId(mRange.getAssignmentId());
-                random.setLastUsed(localDateTime);
-                // save the random
-                randomRepository.save(random);
-            }
-        }
-        // if it skip if statement then its carrier
         // get count of numbers between from and to
         BigInteger _from=new BigInteger(mRange.get_From());
         BigInteger difference=_to.subtract(_from);
@@ -74,7 +53,28 @@ public class MediaController {
         // get the count and set it
         mRange.setCount(diff);
         // save range
-        mRangeRepository.save(mRange);
+        Range mRange1=mRangeRepository.save(mRange);
+
+        // its random
+        if(mRange.getCarrierId()==null) {
+            long from=Long.parseLong(mRange.get_From());
+            // loop from _from to _to
+            for (BigInteger bi = BigInteger.valueOf(from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
+                // get the current date
+                LocalDate localDateTime = LocalDate.now();
+                // number is the bi
+                String number=String.valueOf(bi);
+                // create new random and set values to it
+                Random random=new Random();
+                random.setRangeId(mRange1.getRangeId());
+                random.setNumber(number);
+                random.setCarrierId(mRange1.getCarrierId());
+                random.setAssignmentId(mRange1.getAssignmentId());
+                random.setLastUsed(localDateTime);
+                // save the random
+                randomRepository.save(random);
+            }
+        }
         return mRangeRepository.findAll();
     }
 
@@ -113,7 +113,7 @@ public class MediaController {
     }
 
 
-    
+
 
     @PostMapping(value="/assignments/saveAssignment")
     public List<Random> saveAndgetRandoms(@RequestBody Assignment assignment){
