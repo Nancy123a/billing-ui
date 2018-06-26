@@ -32,6 +32,7 @@ public class MediaController {
         Page<Range> ranges = null;
         if(_From==null || _From.equalsIgnoreCase("")) {
             ranges=mRangeRepository.findAll(pageRequest);
+
         }
         else{
             ranges=mRangeRepository.findBy_FromContainingIgnoreCase(_From, pageRequest);
@@ -48,7 +49,8 @@ public class MediaController {
                 BigInteger _to=new BigInteger(mRange.get_To());
                 for (BigInteger bi = BigInteger.valueOf(_from); bi.compareTo(_to) <= 0; bi = bi.add(BigInteger.ONE)) {
                         LocalDate localDateTime = LocalDate.now();
-                        Random random = new Random(mRange.getRangeId(),bi, mRange.getCarrierId(), mRange.getAssignmentId(), localDateTime);
+                        String number=String.valueOf(bi);
+                        Random random = new Random(mRange.getRangeId(),number, mRange.getCarrierId(), mRange.getAssignmentId(), localDateTime);
                         randomRepository.save(random);
 
                 }
@@ -57,10 +59,15 @@ public class MediaController {
         return mRangeRepository.findAll();
     }
 
-    @GetMapping(value = "/random")
-    public List<Random> getAllRandom(){
-        return randomRepository.findAll();
+    @GetMapping(value="/random/findByNumber")
+    public Page<Random> getAllRandom(@RequestParam("number") String number,Pageable pageRequest){
+        Page<Random> randoms = null;
+        if(number==null || number.equalsIgnoreCase("")) {
+            randoms=randomRepository.findAll(pageRequest);
+        }
+        else{
+            randoms=randomRepository.findByNumberContainingIgnoreCase(number, pageRequest);
+        }
+        return randoms;
     }
-
-
 }

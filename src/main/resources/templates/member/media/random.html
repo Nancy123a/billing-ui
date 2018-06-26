@@ -176,16 +176,27 @@
                     var el = $("#mainWidget");
                     blockUI(el);
 
-                    var url = "/api/random";
+                    var url = "/api/random/findByNumber";
 
 
                     var response = $.ajax({
-                        "url": url
+                        "url": url,
+                        "data": {
+                            number: (data.search.value != null) ? data.search.value : '',
+                            size: data.length,
+                            page: (data.start == 0) ? 0 : (data.start / data.length),
+                            sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
+                        }
                     });
 
                     response.done(function (json) {
                         var result = {};
-                        result.data = json;
+                        result.data = json.content;
+                        if (recordsTotal == 0) {
+                            recordsTotal = json.totalElements;
+                        }
+                        result.recordsTotal = recordsTotal;
+                        result.recordsFiltered = json.totalElements;
                         callback(result);
                     });
 
