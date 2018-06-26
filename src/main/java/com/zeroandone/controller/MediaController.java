@@ -99,6 +99,9 @@ public class MediaController {
     @PostMapping(value="/assignments/saveAssignment")
     public List<Random> saveAndgetRandoms(@RequestBody Assignment assignment){
         List<Random> Random_List=new ArrayList<>();
+        if(assignment.getPrefix().length()>4){
+            assignment.setPrefix(assignment.getPrefix().substring(0,4));
+        }
         Assignment assignment1=assignmentRepository.save(assignment);
         if(assignment.getPrefix()!=null && !assignment.getPrefix().equalsIgnoreCase("")){
             List<Random>randoms=randomRepository.findAllByNumberStartingWithAndCarrierIdIsNull(assignment.getPrefix());
@@ -110,6 +113,19 @@ public class MediaController {
             }
         }
         return Random_List;
+    }
+
+
+
+
+    @DeleteMapping(value = "/randoms/deleteRandoms")
+    public Random DeleteRandom(@RequestBody Random _random){
+        Random random=randomRepository.findOne(_random.getRandomId());
+        random.setCarrierId(null);
+        random.setAssignmentId(0);
+        randomRepository.save(random);
+        assignmentRepository.delete(_random.getAssignmentId());
+        return random;
     }
 
 }

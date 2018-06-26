@@ -315,12 +315,16 @@
 
             $('#btnCloseErrorDivAdd').click(function () {
                 $('#errorMessageDivAdd').css("display", "none");
+
             });
 
             $('#addassignmentModal').on('shown.bs.modal', function (e) {
                setDate();
             });
 
+            $('#addassignmentModal').on('hide.bs.modal', function (e) {
+                $("#AddassignmentForm")[0].reset();
+            });
 
             function setDate(){
                 var today = new Date();
