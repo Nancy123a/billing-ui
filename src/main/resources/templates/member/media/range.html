@@ -175,31 +175,44 @@
                 ],
                 "ajax": function (data, callback, settings) {
 
+                    console.log(data);
+
                     var el = $("#mainWidget");
                     blockUI(el);
 
-                    var url = "/api/ranges";
+                    var url = "/api/ranges/findBy_From";
+
+
+//                    if (data.search != null && data.search.value != "") {
+//                        url = "/api/ranges/findBy_From";
+//                    }
+
+                    console.log(url);
 
 
                     var response = $.ajax({
-                        "url": url
+                        "url": url,
+                        "data": {
+                            _From: (data.search.value != null) ? data.search.value : '',
+                            size: data.length,
+                            page: (data.start == 0) ? 0 : (data.start / data.length),
+                            sort: data.columns[data.order[0].column].data + ',' + data.order[0].dir
+                        }
+
                     });
 
                     response.done(function (json) {
                         var result = {};
-                        result.data = json;
-                        if(recordsTotal==0){
-                         if(result.data!=null && result.data.length>0) {
-                          recordsTotal = result.data.length;
-                        }
-                         else{
-                        recordsTotal=0;
-                         }
-                         }
-                      result.recordsTotal=recordsTotal;
-                      result.recordsFiltered =recordsTotal;
+                        result.data = json.content;
+                            if (recordsTotal == 0) {
+                                recordsTotal = json.totalElements;
+                            }
+                            result.recordsTotal = recordsTotal;
+                            result.recordsFiltered = json.totalElements;
+
                         callback(result);
                     });
+
 
                     response.fail(function (errorThrown) {
                         var errorMessage = (errorThrown.responseJSON) ? errorThrown.responseJSON.message : errorThrown.responseText;
@@ -208,6 +221,7 @@
                     });
                 }
             });
+
 
             $('#rangeType').change(function(){
                 if($(this).val() == "Carrier"){

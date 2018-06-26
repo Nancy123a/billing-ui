@@ -2,7 +2,6 @@ package com.zeroandone.repository;
 
 import com.querydsl.core.types.dsl.StringPath;
 import com.zeroandone.domain.Carrier;
-import com.zeroandone.domain.MRange;
 import com.zeroandone.domain.QCarrier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
