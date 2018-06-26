@@ -19,6 +19,15 @@
     </div>
 
     <div class="row">
+        <div id="errorMessageDivDelete" class="alert alert-danger" style="display:none;">
+            <button id="btnCloseErrorDiv" type="button" class="close">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <label id="errorMessageDelete">Error You cant Delete this row</label>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-12 portlets">
             <div class="widget">
                 <div class="widget-header">
@@ -52,42 +61,86 @@
         </div>
     </div>
 
-    <div id="addrandomModal" class="modal fade"  role="dialog" aria-labelledby="label"
-         aria-hidden="true">
+    <div id="Delete" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deletelabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
                     </button>
-                    <h4 class="modal-title" id="label">Add Random</h4>
+                    <h4 class="modal-title" id="deletelabel">Delete Random</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to unassign this random?</p>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="row">
+
+                                <div class="col-md-2"></div>
+                                <div class="col-md-2">
+                                    <button type="button" data-dismiss="modal" class="btn btn-darkblue-1" id="cancelDelete">Cancel
+                                    </button>
+                                </div>
+                                <div class="col-md-3"></div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-darkblue-1" id="okDelete">OK
+                                    </button>
+                                </div>
+
+                                <div class="col-md-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <div id="Assign" class="modal fade"  role="dialog" aria-labelledby="label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" id="close" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="label">Assign Random</h4>
                 </div>
                 <div class="modal-body">
                     <div id="errorMessageDivAdd" class="alert alert-danger" style="display: none;">
                         <button id="btnCloseErrorDivAdd" type="button" class="close">
                             <i class="ace-icon fa fa-times"></i>
                         </button>
-                        <label id="errorMessageAdd">Please fill missing data</label>
+                        <label id="errorMessageAdd"></label>
                     </div>
-                    <form role="form" id="AddrandomForm">
+                    <form role="form" id="AssignRandomForm">
                         <div class="form-group">
-                            <label>Range From:</label>
-                            <select class="form-control" id="rangeselect" style="width:100%;"/>
+                            <label>Assignment Prefix:</label>
+                            <input type="number" class="form-control" placeholder="Assignment Prefix" id="prefix" readonly="readonly"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Count:</label>
+                            <input type="number" class="form-control" placeholder="Count" id="count" readonly="readonly"/>
                         </div>
                         <div class="form-group">
                             <label>Carrier Name:</label>
                             <select class="form-control" id="carrierselect" style="width:100%;"/>
                         </div>
                         <div class="form-group">
-                            <label>Assignment Prefix:</label>
-                            <select class="form-control" id="assignmentselect" style="width:100%;"/>
+                            <label>Assignment Date:</label>
+                            <input type="date" class="form-control"  id="assignment_date"/>
                         </div>
                         <div class="form-group">
-                            <label>Number:</label>
-                            <input type="number" class="form-control" placeholder="Number" id="number"/>
+                            <label>Requester:</label>
+                            <input type="text" class="form-control" placeholder="Requester" id="requester"/>
                         </div>
                         <div class="form-group">
-                            <label>Last Used:</label>
-                            <input type="date" class="form-control"  id="lastUsed"/>
+                            <label>Assignment Type:</label>
+                            <input type="text" class="form-control" placeholder="Assignment Type" id="assignment_type"/>
                         </div>
                     </form>
                     <div class="row">
@@ -96,7 +149,7 @@
                             <div class="row">
                                 <div class="col-md-3"></div>
                                 <div class="col-md-4">
-                                    <button type="submit" class="btn btn-darkblue-1" id="buttonadd">Add Random</button>
+                                    <button type="submit" class="btn btn-darkblue-1" id="assignRandom">Assign Random</button>
                                 </div>
                                 <div class="col-md-3"></div>
                             </div>
@@ -109,6 +162,7 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
 
 </div>
 
@@ -131,14 +185,9 @@
         // <![CDATA[
         var table;
         var recordsTotal = 0;
+        var data="";
+        var Assign_data="";
         $(function () {
-
-            $('#randomDT').on('init.dt', function () {
-                $('.data-add')
-                    .attr('data-toggle', 'modal')
-                    .attr('data-target', '#addrandomModal');
-            });
-
 
             table = $('#randomDT').DataTable({
                 dom: '<"row"<"col-xs-4"l><"col-xs-3"f><"col-xs-5"<"pull-right"B>>>rt<"row"<"col-xs-6"i><"col-xs-6"p>>',
@@ -148,12 +197,6 @@
                 searchDelay: 700,
                 processing: true,
                 buttons: [
-                    {
-                        text: 'Add Random',
-                        action: function () {
-                        },
-                        className: 'data-add'
-                    },
                     'copyHtml5',
                     'csvHtml5',
                     'excelHtml5',
@@ -176,11 +219,13 @@
                         "render": function ( data, type, row, meta ) {
                             if(row.carrierId!=null){
                                 return '<div class="pull-center btn-group">\n' +
-                                    '<a title="Delete" class="free btn btn-danger">Delete</a>'+
+                                    '<a title="Delete" class="delete btn btn-danger" data-toggle="modal" data-target="#Delete">Delete</a>'+
                                     '</div>';
                             }
                             else{
-                                return '<div><p></p></div>'
+                                return '<div class="pull-center btn-group">\n' +
+                                    '<a title="Assign" class="assign btn btn-success" data-toggle="modal" data-target="#Assign">Assign</a>'+
+                                    '</div>';
                             }
 
                         }
@@ -226,7 +271,147 @@
             $('#btnCloseErrorDivAdd').click(function () {
                 $('#errorMessageDivAdd').css("display", "none");
             });
+
+
+            $('#randomDT').on('click', 'a.delete', function (e) {
+                data = table.row($(this).parents('tr')).data();
+            });
+
+            $('#randomDT').on('click', 'a.assign', function (e) {
+                Assign_data = table.row($(this).parents('tr')).data();
+            });
+
+            $("#cancelDelete").click(function () {
+                $('#Delete .close').click();
+            });
+
+            $("#okDelete").click(function () {
+               console.log(data);
+                var url = "/api/randoms/deleteRandoms";
+
+                $.ajax({
+                    type: "DELETE",
+                    contentType: "application/json",
+                    url: url,
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    success: function (result) {
+                        console.log(result);
+                        table.ajax.reload();
+                        $('#Delete .close').click();
+                    },
+                    error: function (e) {
+                        console.log(e);
+                        $('#Delete .close').click();
+                        $('#errorMessageDivDelete').css("display", "block");
+                    }
+                });
+
+            });
+
+            $('#Assign').on('shown.bs.modal', function (e) {
+                fillCarriers();
+                setDate();
+            });
+
+            $('#Assign').on('hide.bs.modal', function (e) {
+                $("#AssignRandomForm")[0].reset();
+            });
+
+            function setDate(){
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1; //January is 0!
+                var yyyy = today.getFullYear();
+                if(dd<10){dd='0'+dd}
+                if(mm<10){mm='0'+mm}
+                today = yyyy+"-"+mm+"-"+dd;
+                $("#assignment_date").val(today);
+                $("#count").val(1);
+                var prefix=Assign_data.number.substring(0,4);
+                $("#prefix").val(prefix);
+            }
+
+            function fillCarriers(){
+                if (!$('#carrierselect').hasClass("select2-hidden-accessible")) {
+                    $('#carrierselect').select2({
+                        minimumInputLength: 1,
+                        language: {
+                            inputTooShort: function () {
+                                return "Enter Carrier Name";
+                            }
+                        },
+                        ajax : {
+                            url : "/api/carriers",
+                            quietMillis : 500,
+                            data : function(params) {
+                                return {
+                                    carrierName: params.term,
+                                    page: (params.page || 1) - 1,
+                                    projection: 'select2'
+                                }
+                            },
+                            processResults : function (data,page) {
+                                console.log(data);
+                                if (data._embedded)
+                                    return { results: data._embedded.carriers};
+                                else
+                                    return {results: data};
+                            }
+                        },
+                        theme: 'bootstrap'
+                    });
+                } else {
+                    $('#carrierselect').val(null);
+                    $('#carrierselect').trigger('change');
+                }
+            }
+
+            $("#assignRandom").click(function () {
+                var prefix=$("#prefix").val();
+                var count=$("#count").val();
+                var carrier_id= $("#carrierselect").select2('val');
+                var assignment_date=$("#assignment_date").val();
+                var requester=$("#requester").val();
+                var assignment_type=$("#assignment_type").val();
+                if(prefix!=null && prefix!="" && count!=null && count!="" && carrier_id!=null && carrier_id!="" && assignment_date!=null && assignment_date!=""
+                    && requester!=null && requester!="" && assignment_type!=null && assignment_type!=""){
+                    var Data = {
+                        assignmentDate: assignment_date,
+                        requester: requester,
+                        carrierId:carrier_id,
+                        prefix:Assign_data.number,
+                        count:count,
+                        assignmentType:assignment_type
+                    };
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json",
+                        url: "/api/assignments/saveAssignment",
+                        data: JSON.stringify(Data),
+                        dataType: 'json',
+                        success: function (result) {
+                            console.log(result);
+                            table.ajax.reload();
+                            $('#errorMessageDivAdd').css("display", "none");
+                            $("#Assign .close").click();
+                            $("#AssignRandomForm")[0].reset();
+                        },
+                        error: function (e) {
+                            console.log(e);
+                        }
+                    });
+                }
+                else{
+                    $('#errorMessageDivAdd').css("display", "block");
+                    $('#errorMessageAdd').text("Please fill missing data");
+                }
+
+            });
+
+
         });
+
 
         // ]]>
 
