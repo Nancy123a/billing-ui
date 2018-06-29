@@ -150,11 +150,11 @@ public class MediaController {
 
     // deleting single random by clicking delete button
     @DeleteMapping(value = "/randoms/deleteRandoms")
-    public Random DeleteRandom(@RequestBody Random _random){
-        _random.setCarrierId(null);
-        _random.setAssignmentId(0);
-        randomRepository.save(_random);
-        Assignment assignment=assignmentRepository.findOne(_random.getAssignmentId());
+    public Assignment DeleteRandom(@RequestBody Random random){
+        Assignment assignment=assignmentRepository.findOne(random.getAssignmentId());
+        random.setCarrierId(null);
+        random.setAssignmentId(0);
+        randomRepository.save(random);
         // if the count is greater than 1 then update count by decreasing it by 1 else delete the assignment
         if(assignment.getCount()>1){
             // set the count by decreasing it by 1
@@ -166,7 +166,7 @@ public class MediaController {
             // delete assignment
             assignmentRepository.delete(assignment);
         }
-        return _random;
+        return assignment;
     }
 
 }

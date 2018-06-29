@@ -18,8 +18,6 @@ public interface RangeRepository extends JpaRepository<Range, Integer>,QueryDslP
 
     Page<Range> findBy_FromContainingIgnoreCase(@Param("_From") String searchTerm, Pageable pageRequest);
 
-
-
     default void customize(QuerydslBindings bindings, QRange qmRange)
     {
         bindings.bind(qmRange._From).first((StringPath path, String value) -> path.containsIgnoreCase(value));

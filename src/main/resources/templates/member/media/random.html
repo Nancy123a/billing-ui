@@ -286,6 +286,8 @@
             });
 
             $("#okDelete").click(function () {
+                console.log("Data is: ");
+                console.log(data);
                 var url = "/api/randoms/deleteRandoms";
 
                 $.ajax({
