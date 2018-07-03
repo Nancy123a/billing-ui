@@ -31,5 +31,15 @@ public class Range {
 
     private int count;
 
+    public Range() {
+    }
 
+    public Range(String carrierId, String rangeType, String _To, String _From, int assignmentId, int count) {
+        this.carrierId = carrierId;
+        this.rangeType = rangeType;
+        this._To = _To;
+        this._From = _From;
+        this.assignmentId = assignmentId;
+        this.count = count;
+    }
 }

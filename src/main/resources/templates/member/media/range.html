@@ -179,6 +179,7 @@
                     {
                         "data": "click button",
                         "render": function ( data, type, row, meta ) {
+                            fillCarriers();
                             if(row.rangeId==null){
                                 return '<div class="pull-center btn-group">\n' +
                                     '<a title="Free" class="free btn btn-success" data-toggle="modal" data-target="#addrangeModal">Free</a>'+

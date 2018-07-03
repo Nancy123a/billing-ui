@@ -20,7 +20,10 @@ public interface RandomRepository  extends JpaRepository<Random, Integer>,QueryD
 
     Page<Random> findByNumberContainingIgnoreCase(@Param("number") String searchTerm, Pageable pageRequest);
 
+
     List<Random> findAllByNumberStartingWithAndCarrierIdIsNull(@Param("number") String number);
+
+    Random findByNumberEquals(@Param("number")String number);
 
 
     default void customize(QuerydslBindings bindings, QRandom qRandom)
